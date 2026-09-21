@@ -13,6 +13,10 @@ const INITIAL=[
  ['MAHI',44,27,17,236,48,0,0]
 ];
 
+
+function doPost(e){
+  return ContentService.createTextOutput(JSON.stringify({ok:false,error:'এই সাইটে ছবি GET API দিয়ে সেভ করা হয়'})).setMimeType(ContentService.MimeType.JSON);
+}
 function doGet(e){
   const p=e&&e.parameter?e.parameter:{};
   if(p.api==='1') return api_(p);

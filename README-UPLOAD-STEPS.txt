@@ -12,3 +12,6 @@
 
 
 UPDATED: index.html now uses the new Google Apps Script Web App URL supplied by the user and shows a large player photo on the left with all player stats on the right.
+
+
+HD FIX: Photo upload now uses POST + Google Drive storage to avoid URL-length failures. New photos are resized to max 512px and saved at high quality. IMPORTANT: replace both index.html AND Code.gs, then redeploy the Apps Script Web App as a new version.

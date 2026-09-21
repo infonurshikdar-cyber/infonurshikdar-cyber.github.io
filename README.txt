@@ -1,8 +1,15 @@
-Cricket Stats — Netlify package
+Cricket Stats — One Player Photo Version
 
-This package uses the NEW Apps Script Web App URL:
-https://script.google.com/macros/s/AKfycbzfcPaAZvb4vOGDlFYS9sD_330GVM8ncTyhnDzqJr_RIwx0WXSXy_X_qmCqv3Rvq828/exec
+এই ভার্সনে একবারে একজন Player বেছে তার ছবি সেভ করা যাবে।
+নতুন Player যোগ করার সময় ছবি দিতে হবে না।
 
-Deploy these files to Netlify.
-Do not publish the Google Sheet itself.
-Admin PIN remains the one configured in Code.gs.
+ফাইল:
+- index.html
+- Code.gs
+
+ব্যবহার:
+1. index.html GitHub Pages-এ আপলোড করুন।
+2. Code.gs Apps Script-এ বসিয়ে Deploy as Web app করুন।
+3. Admin > Player-এর ছবি > একজন Player নির্বাচন > ছবি নির্বাচন > ছবি সেভ করুন।
+
+ছবি ছোট করে সেভ হয়, তাই Google Sheet cell-এর সীমার মধ্যে থাকে।
