@@ -89,7 +89,7 @@ function addPlayer_(p){
 function updatePhoto_(p){
   auth_(p); const name=String(p.name||''); const data=String(p.photo||'');
   if(!data) throw new Error('ছবি পাওয়া যায়নি');
-  if(data.length>900000) throw new Error('ছবিটি অনেক বড়। একটু ছোট ছবি দিন');
+  if(data.length>8000000) throw new Error('ছবিটি 8MB-এর বেশি। 8MB-এর মধ্যে ছবি দিন');
   const url=savePhotoToDrive_(data,name);
   const sh=SpreadsheetApp.getActiveSpreadsheet().getSheetByName(STATS_SHEET); const v=sh.getDataRange().getValues();
   for(let i=1;i<v.length;i++) if(String(v[i][0])===name){sh.getRange(i+1,9).setValue(url);return {ok:true,message:'Player-এর HD ছবি সেভ হয়েছে',players:readPlayers_()};}
@@ -100,10 +100,12 @@ function savePhotoToDrive_(dataUrl,name){
   if(!m) throw new Error('ছবির ফরম্যাট ঠিক নয়');
   const bytes=Utilities.base64Decode(m[2]);
   const safe=String(name||'Player').replace(/[^A-Za-z0-9_-]/g,'_');
-  const blob=Utilities.newBlob(bytes,m[1],safe+'_'+Date.now()+'.jpg');
+  const mime=m[1]||'image/jpeg';
+  const ext=mime==='image/png'?'png':(mime==='image/webp'?'webp':'jpg');
+  const blob=Utilities.newBlob(bytes,mime,safe+'_'+Date.now()+'.'+ext);
   const file=DriveApp.createFile(blob);
   try{file.setSharing(DriveApp.Access.ANYONE_WITH_LINK,DriveApp.Permission.VIEW);}catch(e){}
-  return 'https://drive.google.com/thumbnail?id='+file.getId()+'&sz=w1600';
+  return 'https://drive.google.com/uc?export=view&id='+file.getId();
 }
 
 function deletePlayer_(p){
