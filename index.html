@@ -12,9 +12,23 @@ const API='https://script.google.com/macros/s/AKfycbxCSeH5OjhjT5AoLZQEmtdE-gYf1h
 function show(id){['home','players','admin'].forEach(x=>document.getElementById(x).classList.toggle('hide',x!==id));['homeBtn','playersBtn','adminBtn'].forEach(x=>document.getElementById(x).classList.remove('active'));document.getElementById(id+'Btn').classList.add('active')}
 function api(params,cb){const s=document.createElement('script');const c='cb'+Date.now()+Math.floor(Math.random()*10000);params.api='1';params.callback=c;window[c]=(x)=>{delete window[c];s.remove();cb(x)};s.src=API+'?'+new URLSearchParams(params).toString();s.onerror=()=>{delete window[c];s.remove();cb({ok:false,error:'Backend connection failed'})};document.body.appendChild(s)}
 function load(){api({action:'get'},x=>{if(!x.ok){document.getElementById('cards').innerHTML='<div>Backend সংযোগ হচ্ছে না। Apps Script deployment ঠিক আছে কি না দেখুন।</div>';return}DATA=x;render()})}
+function overallScore(p){
+ const m=Math.max(1,p.match||0);
+ const winRate=(p.won||0)/m;
+ const batAvg=(p.run||0)/m;
+ const wicketAvg=(p.wicket||0)/m;
+ const fiftyRate=(p.fifty||0)/m;
+ const hundredRate=(p.hundred||0)/m;
+ const players=DATA.players;
+ const max=(key)=>Math.max(...players.map(x=>{const mm=Math.max(1,x.match||0); if(key==='bat')return (x.run||0)/mm; if(key==='wicket')return (x.wicket||0)/mm; if(key==='fifty')return (x.fifty||0)/mm; if(key==='hundred')return (x.hundred||0)/mm; return 0}),0);
+ const n=(v,mx)=>mx>0?v/mx:0;
+ return winRate*0.40+n(batAvg,max('bat'))*0.25+n(wicketAvg,max('wicket'))*0.25+n(fiftyRate,max('fifty'))*0.05+n(hundredRate,max('hundred'))*0.05;
+}
+
 function render(){
- document.getElementById('cards').innerHTML=DATA.players.map(p=>`<div class="player"><div class="playerHead"><h3>${esc(p.name)}</h3></div><div class="playerStats"><div>🏆 Match: ${p.match}</div><div>✅ Win: ${p.won}</div><div>❌ Lost: ${p.lost}</div><div>🏃 Run: ${p.run}</div><div>📈 Win Rate: ${p.match?(p.won/p.match*100).toFixed(1):'0.0'}%</div><div>🏏 Batting Average: ${p.match?(p.run/p.match).toFixed(2):'0.00'}</div><div>🎯 Wicket Average: ${p.match?(p.wicket/p.match).toFixed(2):'0.00'}</div><div>⚾ Wicket: ${p.wicket}</div><div>⭐ 50: ${p.fifty}</div><div>⭐ 100: ${p.hundred}</div></div></div>`).join('');
- document.getElementById('stats').innerHTML=DATA.players.map(p=>`<tr><td><b>${esc(p.name)}</b></td><td>${p.match}</td><td>${p.won}</td><td>${p.lost}</td><td>${p.match?(p.won/p.match*100).toFixed(2):'0.00'}%</td><td>${p.run}</td><td>${p.match?(p.run/p.match).toFixed(2):'0.00'}</td><td>${p.wicket}</td><td>${p.match?(p.wicket/p.match).toFixed(2):'0.00'}</td><td>${p.fifty}</td><td>${p.hundred}</td></tr>`).join('');
+ const ranked=[...DATA.players].sort((a,b)=>overallScore(b)-overallScore(a));
+ document.getElementById('cards').innerHTML=ranked.map(p=>`<div class="player"><div class="playerHead"><h3>${esc(p.name)}</h3></div><div class="playerStats"><div>🏆 Match: ${p.match}</div><div>✅ Win: ${p.won}</div><div>❌ Lost: ${p.lost}</div><div>🏃 Run: ${p.run}</div><div>📈 Win Rate: ${p.match?(p.won/p.match*100).toFixed(1):'0.0'}%</div><div>🏏 Batting Average: ${p.match?(p.run/p.match).toFixed(2):'0.00'}</div><div>🎯 Wicket Average: ${p.match?(p.wicket/p.match).toFixed(2):'0.00'}</div><div>⚾ Wicket: ${p.wicket}</div><div>⭐ 50: ${p.fifty}</div><div>⭐ 100: ${p.hundred}</div></div></div>`).join('');
+ document.getElementById('stats').innerHTML=ranked.map(p=>`<tr><td><b>${esc(p.name)}</b></td><td>${p.match}</td><td>${p.won}</td><td>${p.lost}</td><td>${p.match?(p.won/p.match*100).toFixed(2):'0.00'}%</td><td>${p.run}</td><td>${p.match?(p.run/p.match).toFixed(2):'0.00'}</td><td>${p.wicket}</td><td>${p.match?(p.wicket/p.match).toFixed(2):'0.00'}</td><td>${p.fifty}</td><td>${p.hundred}</td></tr>`).join('');
  const opts=DATA.players.map(p=>`<option value="${esc(p.name)}">${esc(p.name)}</option>`).join('');document.getElementById('player').innerHTML=opts;document.getElementById('adjustPlayer').innerHTML=opts;
 }
 function login(){const p=document.getElementById('pin').value.trim();if(!p){document.getElementById('loginMsg').textContent='Admin PIN দিন';return}api({action:'checkPin',pin:p},x=>{if(x.ok){PIN=p;document.getElementById('login').classList.add('hide');document.getElementById('panel').classList.remove('hide');document.getElementById('loginMsg').textContent=''}else document.getElementById('loginMsg').textContent=x.error||'ভুল Admin PIN'})}
