@@ -27,6 +27,7 @@ function api_(p){
     else if(action==='checkPin') { auth_(p); result={ok:true,message:'Admin verified'}; }
     else if(action==='save') result=save_(p);
     else if(action==='addPlayer') result=addPlayer_(p);
+    else if(action==='updatePhoto') result=updatePhoto_(p);
     else if(action==='deletePlayer') result=deletePlayer_(p);
     else if(action==='resetPlayer') result=resetPlayer_(p);
     else if(action==='deleteHistory') result=deleteHistory_(p);
@@ -40,14 +41,14 @@ function api_(p){
 function setup_(){
   const ss=SpreadsheetApp.getActiveSpreadsheet();
   let sh=ss.getSheetByName(STATS_SHEET);
-  if(!sh){sh=ss.insertSheet(STATS_SHEET);sh.appendRow(['Player','Total Match','Won','Lost','Total Run','Total Wicket','50','100']);INITIAL.forEach(r=>sh.appendRow(r));}
+  if(!sh){sh=ss.insertSheet(STATS_SHEET);sh.appendRow(['Player','Total Match','Won','Lost','Total Run','Total Wicket','50','100','Photo']);INITIAL.forEach(r=>sh.appendRow(r.concat([''])));}else if(sh.getLastColumn()<9){sh.getRange(1,9).setValue('Photo');}
   let h=ss.getSheetByName(HISTORY_SHEET);
   if(!h){h=ss.insertSheet(HISTORY_SHEET);h.appendRow(['ID','Player','Match','Won','Lost','Run','Wicket','50','100','CreatedAt']);}
 }
 function readPlayers_(){
   const sh=SpreadsheetApp.getActiveSpreadsheet().getSheetByName(STATS_SHEET);
   const v=sh.getDataRange().getValues();
-  return v.slice(1).filter(r=>r[0]).map(r=>({name:String(r[0]),match:+r[1]||0,won:+r[2]||0,lost:+r[3]||0,run:+r[4]||0,wicket:+r[5]||0,fifty:+r[6]||0,hundred:+r[7]||0}));
+  return v.slice(1).filter(r=>r[0]).map(r=>({name:String(r[0]),match:+r[1]||0,won:+r[2]||0,lost:+r[3]||0,run:+r[4]||0,wicket:+r[5]||0,fifty:+r[6]||0,hundred:+r[7]||0,photo:String(r[8]||'')}));
 }
 function auth_(p){ if(String(p.pin||'')!==ADMIN_PIN) throw new Error('ভুল Admin PIN'); }
 function save_(p){
@@ -70,7 +71,14 @@ function addPlayer_(p){
   auth_(p); const name=String(p.name||'').trim(); if(!name) throw new Error('Player name দিন');
   const sh=SpreadsheetApp.getActiveSpreadsheet().getSheetByName(STATS_SHEET);
   if(readPlayers_().some(x=>x.name.toLowerCase()===name.toLowerCase())) throw new Error('এই player আগে থেকেই আছে');
-  sh.appendRow([name,0,0,0,0,0,0,0]); return {ok:true,message:'Player যোগ হয়েছে',players:readPlayers_()};
+  sh.appendRow([name,0,0,0,0,0,0,0,String(p.photo||'')]); return {ok:true,message:'Player যোগ হয়েছে',players:readPlayers_()};
+}
+function updatePhoto_(p){
+  auth_(p); const name=String(p.name||''); const photo=String(p.photo||'');
+  if(photo && photo.length>45000) throw new Error('ছবিটি খুব বড়। ছোট ছবি দিন');
+  const sh=SpreadsheetApp.getActiveSpreadsheet().getSheetByName(STATS_SHEET); const v=sh.getDataRange().getValues();
+  for(let i=1;i<v.length;i++) if(String(v[i][0])===name){sh.getRange(i+1,9).setValue(photo);return {ok:true,message:'Player-এর ছবি সেভ হয়েছে',players:readPlayers_()};}
+  throw new Error('Player পাওয়া যায়নি');
 }
 function deletePlayer_(p){
   auth_(p); const name=String(p.name||'');
