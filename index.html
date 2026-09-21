@@ -49,7 +49,7 @@ api({action:'addPlayer',pin:PIN,name:name},done('manageMsg'));
 }
 
 function photoSrc(photo,name){return photo||'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120"><rect width="120" height="120" fill="#dce6f5"/><text x="60" y="68" text-anchor="middle" font-size="44" fill="#164a9c">'+String(name||'?').charAt(0).toUpperCase()+'</text></svg>')}
-function imageToDataUrl(file){return new Promise(resolve=>{if(!file){resolve('');return}const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const max=96,scale=Math.min(1,max/Math.max(im.width,im.height));const c=document.createElement('canvas');c.width=Math.max(1,Math.round(im.width*scale));c.height=Math.max(1,Math.round(im.height*scale));c.getContext('2d').drawImage(im,0,0,c.width,c.height);resolve(c.toDataURL('image/jpeg',0.70));};im.onerror=()=>resolve('');im.src=r.result};r.onerror=()=>resolve('');r.readAsDataURL(file)})}
+function imageToDataUrl(file){return new Promise(resolve=>{if(!file){resolve('');return}const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const max=1600,scale=Math.min(1,max/Math.max(im.width,im.height));const c=document.createElement('canvas');c.width=Math.max(1,Math.round(im.width*scale));c.height=Math.max(1,Math.round(im.height*scale));const ctx=c.getContext('2d');ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';ctx.drawImage(im,0,0,c.width,c.height);let q=0.96;let out=c.toDataURL('image/jpeg',q);while(out.length>900000 && q>0.82){q-=0.02;out=c.toDataURL('image/jpeg',q)}resolve(out);};im.onerror=()=>resolve('');im.src=r.result};r.onerror=()=>resolve('');r.readAsDataURL(file)})}
 function previewManagePhoto(){const f=document.getElementById('managePhoto').files[0];const box=document.getElementById('managePhotoPreview');if(!f){loadManagePhoto();return}const r=new FileReader();r.onload=()=>box.innerHTML='<img src="'+r.result+'" alt="new preview"><span>ছবি নির্বাচিত</span>';r.readAsDataURL(f)}
 function loadManagePhoto(){const p=DATA.players.find(x=>x.name===document.getElementById('managePlayer').value);document.getElementById('managePhotoPreview').innerHTML=p&&p.photo?'<img src="'+p.photo+'" alt="photo">':'<span>ছবি নেই</span>'}
 async function savePlayerPhoto(){
@@ -60,7 +60,19 @@ if(!file){document.getElementById('manageMsg').textContent='ছবি নির�
 document.getElementById('manageMsg').textContent='ছবি সেভ হচ্ছে...';
 const photo=await imageToDataUrl(file);
 if(!photo){document.getElementById('manageMsg').textContent='ছবি পড়তে সমস্যা হয়েছে';return}
-api({action:'updatePhoto',pin:PIN,name:name,photo:photo},done('manageMsg'));
+savePhotoPost(name,photo);
+}
+
+function savePhotoPost(name,photo){
+  const msg=document.getElementById('manageMsg');
+  msg.textContent='ছবি সেভ হচ্ছে...';
+  const iframe=document.createElement('iframe');
+  iframe.name='photoFrame_'+Date.now(); iframe.style.display='none'; document.body.appendChild(iframe);
+  const form=document.createElement('form'); form.method='POST'; form.action=API; form.target=iframe.name; form.style.display='none';
+  function add(k,v){const i=document.createElement('input');i.type='hidden';i.name=k;i.value=v;form.appendChild(i)}
+  add('action','updatePhoto'); add('pin',PIN); add('name',name); add('photo',photo);
+  document.body.appendChild(form); form.submit();
+  setTimeout(()=>{msg.textContent='ছবি সেভ হয়েছে ✅'; load(); try{iframe.remove();form.remove()}catch(e){}},4500);
 }
 function deletePlayer(){if(!confirm('এই Player সম্পূর্ণ মুছে ফেলবেন?'))return;api({action:'deletePlayer',pin:PIN,name:document.getElementById('managePlayer').value},done('manageMsg'))}
 function resetPlayer(){if(!confirm('এই Player-এর সব Stats 0 করে দেবেন?'))return;api({action:'resetPlayer',pin:PIN,name:document.getElementById('managePlayer').value},done('manageMsg'))}

@@ -15,7 +15,16 @@ const INITIAL=[
 
 
 function doPost(e){
-  return ContentService.createTextOutput(JSON.stringify({ok:false,error:'এই সাইটে ছবি GET API দিয়ে সেভ করা হয়'})).setMimeType(ContentService.MimeType.JSON);
+  const p=e&&e.parameter?e.parameter:{};
+  let result;
+  try{
+    setup_();
+    const action=p.action||'';
+    if(action==='updatePhoto') result=updatePhoto_(p);
+    else if(action==='addPlayer') result=addPlayer_(p);
+    else throw new Error('Unknown action');
+  }catch(err){ result={ok:false,error:String(err.message||err)}; }
+  return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
 }
 function doGet(e){
   const p=e&&e.parameter?e.parameter:{};
@@ -78,12 +87,25 @@ function addPlayer_(p){
   sh.appendRow([name,0,0,0,0,0,0,0,String(p.photo||'')]); return {ok:true,message:'Player যোগ হয়েছে',players:readPlayers_()};
 }
 function updatePhoto_(p){
-  auth_(p); const name=String(p.name||''); const photo=String(p.photo||'');
-  if(photo && photo.length>45000) throw new Error('ছবিটি খুব বড়। ছোট ছবি দিন');
+  auth_(p); const name=String(p.name||''); const data=String(p.photo||'');
+  if(!data) throw new Error('ছবি পাওয়া যায়নি');
+  if(data.length>900000) throw new Error('ছবিটি অনেক বড়। একটু ছোট ছবি দিন');
+  const url=savePhotoToDrive_(data,name);
   const sh=SpreadsheetApp.getActiveSpreadsheet().getSheetByName(STATS_SHEET); const v=sh.getDataRange().getValues();
-  for(let i=1;i<v.length;i++) if(String(v[i][0])===name){sh.getRange(i+1,9).setValue(photo);return {ok:true,message:'Player-এর ছবি সেভ হয়েছে',players:readPlayers_()};}
+  for(let i=1;i<v.length;i++) if(String(v[i][0])===name){sh.getRange(i+1,9).setValue(url);return {ok:true,message:'Player-এর HD ছবি সেভ হয়েছে',players:readPlayers_()};}
   throw new Error('Player পাওয়া যায়নি');
 }
+function savePhotoToDrive_(dataUrl,name){
+  const m=dataUrl.match(/^data:([^;]+);base64,(.+)$/);
+  if(!m) throw new Error('ছবির ফরম্যাট ঠিক নয়');
+  const bytes=Utilities.base64Decode(m[2]);
+  const safe=String(name||'Player').replace(/[^A-Za-z0-9_-]/g,'_');
+  const blob=Utilities.newBlob(bytes,m[1],safe+'_'+Date.now()+'.jpg');
+  const file=DriveApp.createFile(blob);
+  try{file.setSharing(DriveApp.Access.ANYONE_WITH_LINK,DriveApp.Permission.VIEW);}catch(e){}
+  return 'https://drive.google.com/thumbnail?id='+file.getId()+'&sz=w1600';
+}
+
 function deletePlayer_(p){
   auth_(p); const name=String(p.name||'');
   const sh=SpreadsheetApp.getActiveSpreadsheet().getSheetByName(STATS_SHEET); const v=sh.getDataRange().getValues();
