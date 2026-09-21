@@ -95,7 +95,10 @@ function updatePhoto_(p){
   for(let i=1;i<v.length;i++) if(String(v[i][0])===name){
     const oldUrl=String(v[i][8]||'');
     sh.getRange(i+1,9).setValue(url);
-    try{const mm=oldUrl.match(/googleusercontent\.com\/d\/([^?]+)/);if(mm&&mm[1])DriveApp.getFileById(mm[1]).setTrashed(true);}catch(e){}
+    try{
+      const mm=oldUrl.match(/(?:googleusercontent\.com\/d\/|drive\.google\.com\/uc\?export=view\&id=)([^?&]+)/);
+      if(mm&&mm[1])DriveApp.getFileById(mm[1]).setTrashed(true);
+    }catch(e){}
     return {ok:true,message:'Player-এর HD ছবি সেভ হয়েছে',players:readPlayers_()};
   }
   throw new Error('Player পাওয়া যায়নি');
@@ -110,7 +113,7 @@ function savePhotoToDrive_(dataUrl,name){
   const blob=Utilities.newBlob(bytes,mime,safe+'_'+Date.now()+'.'+ext);
   const file=DriveApp.createFile(blob);
   try{file.setSharing(DriveApp.Access.ANYONE_WITH_LINK,DriveApp.Permission.VIEW);}catch(e){}
-  return 'https://drive.google.com/uc?export=view&id='+file.getId();
+  return 'https://lh3.googleusercontent.com/d/'+file.getId();
 }
 
 function deletePlayer_(p){
