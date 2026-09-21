@@ -92,15 +92,7 @@ function updatePhoto_(p){
   if(Utilities.base64Decode(data.split(',')[1]||'').length>8388608) throw new Error('ছবিটি 8MB-এর বেশি। 8MB-এর মধ্যে ছবি দিন');
   const url=savePhotoToDrive_(data,name);
   const sh=SpreadsheetApp.getActiveSpreadsheet().getSheetByName(STATS_SHEET); const v=sh.getDataRange().getValues();
-  for(let i=1;i<v.length;i++) if(String(v[i][0])===name){
-    const oldUrl=String(v[i][8]||'');
-    sh.getRange(i+1,9).setValue(url);
-    try{
-      const mm=oldUrl.match(/(?:googleusercontent\.com\/d\/|drive\.google\.com\/(?:uc\?export=view\&id=|thumbnail\?id=))([^?&]+)/);
-      if(mm&&mm[1])DriveApp.getFileById(mm[1]).setTrashed(true);
-    }catch(e){}
-    return {ok:true,message:'Player-এর HD ছবি সেভ হয়েছে',players:readPlayers_()};
-  }
+  for(let i=1;i<v.length;i++) if(String(v[i][0])===name){sh.getRange(i+1,9).setValue(url);return {ok:true,message:'Player-এর HD ছবি সেভ হয়েছে',players:readPlayers_()};}
   throw new Error('Player পাওয়া যায়নি');
 }
 function savePhotoToDrive_(dataUrl,name){
@@ -112,17 +104,8 @@ function savePhotoToDrive_(dataUrl,name){
   const ext=mime==='image/png'?'png':(mime==='image/webp'?'webp':'jpg');
   const blob=Utilities.newBlob(bytes,mime,safe+'_'+Date.now()+'.'+ext);
   const file=DriveApp.createFile(blob);
-  try{
-    file.setSharing(DriveApp.Access.ANYONE_WITH_LINK,DriveApp.Permission.VIEW);
-  }catch(e){
-    try{file.setTrashed(true);}catch(ignore){}
-    throw new Error('ছবির Public access চালু করা যায়নি। Google Drive-এর Sharing সেটিংসে Anyone with the link → Viewer দিন।');
-  }
-  if(file.getSharingAccess()!==DriveApp.Access.ANYONE_WITH_LINK){
-    try{file.setTrashed(true);}catch(ignore){}
-    throw new Error('ছবির Public access চালু হয়নি। Google Drive-এর Sharing সেটিংসে Anyone with the link → Viewer দিন।');
-  }
-  return 'https://drive.google.com/thumbnail?id='+file.getId()+'&sz=w4000';
+  try{file.setSharing(DriveApp.Access.ANYONE_WITH_LINK,DriveApp.Permission.VIEW);}catch(e){}
+  return 'https://drive.google.com/thumbnail?id='+file.getId()+'&sz=w2000';
 }
 
 function deletePlayer_(p){
