@@ -48,11 +48,20 @@ if(!name){document.getElementById('manageMsg').textContent='Player name দি�
 api({action:'addPlayer',pin:PIN,name:name},done('manageMsg'));
 }
 
+function drivePhotoUrl(photo){
+  if(!photo)return '';
+  let id='';
+  let m=photo.match(/[?&]id=([^&]+)/);
+  if(m)id=m[1];
+  if(!id){m=photo.match(/\/d\/([A-Za-z0-9_-]+)/);if(m)id=m[1];}
+  if(!id)return photo;
+  return 'https://drive.google.com/thumbnail?id='+encodeURIComponent(id)+'&sz=w1600';
+}
 function photoSrc(photo,name){
   if(!photo)return 'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120"><rect width="120" height="120" fill="#dce6f5"/><text x="60" y="68" text-anchor="middle" font-size="44" fill="#164a9c">'+String(name||'?').charAt(0).toUpperCase()+'</text></svg>');
-  // নতুন ছবির URL-এ cache-busting রাখি, যাতে আগের Player-এর ছবি আটকে না থাকে।
-  const sep=photo.indexOf('?')>=0?'&':'?';
-  return photo+sep+'v='+encodeURIComponent(photo.slice(-80));
+  const u=drivePhotoUrl(photo);
+  const sep=u.indexOf('?')>=0?'&':'?';
+  return u+sep+'v='+encodeURIComponent(photo.slice(-80));
 }
 function imageToDataUrl(file){
   return new Promise(resolve=>{
@@ -99,8 +108,9 @@ function loadManagePhoto(){
   const p=DATA.players.find(x=>x.name===document.getElementById('managePlayer').value);
   const box=document.getElementById('managePhotoPreview');
   if(p&&p.photo){
-    const sep=p.photo.indexOf('?')>=0?'&':'?';
-    box.innerHTML='<img src="'+p.photo+sep+'v='+encodeURIComponent(p.photo.slice(-80))+'" alt="photo">';
+    const u=drivePhotoUrl(p.photo);
+    const sep=u.indexOf('?')>=0?'&':'?';
+    box.innerHTML='<img src="'+u+sep+'v='+encodeURIComponent(p.photo.slice(-80))+'" alt="photo">';
   }else box.innerHTML='<span>ছবি নেই</span>';
 }
 async function savePlayerPhoto(){
