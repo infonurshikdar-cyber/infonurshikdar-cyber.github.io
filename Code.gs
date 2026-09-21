@@ -110,7 +110,7 @@ function savePhotoToDrive_(dataUrl,name){
   const blob=Utilities.newBlob(bytes,mime,safe+'_'+Date.now()+'.'+ext);
   const file=DriveApp.createFile(blob);
   try{file.setSharing(DriveApp.Access.ANYONE_WITH_LINK,DriveApp.Permission.VIEW);}catch(e){}
-  return 'https://lh3.googleusercontent.com/d/'+file.getId()+'?v='+Date.now();
+  return 'https://drive.google.com/uc?export=view&id='+file.getId();
 }
 
 function deletePlayer_(p){
