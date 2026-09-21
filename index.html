@@ -4,8 +4,8 @@
 <section id="home"><div class="card"><h2>Players</h2><div id="cards" class="players"><div class="muted">লোড হচ্ছে...</div></div></div></section>
 <section id="players" class="hide"><div class="card"><h2>📊 সব Stats</h2><div class="scroll"><table><thead><tr><th>Player</th><th>Match</th><th>Won</th><th>Lost</th><th>Win Rate</th><th>Run</th><th>Run Avg</th><th>Wicket</th><th>Wicket Avg</th><th>50</th><th>100</th></tr></thead><tbody id="stats"></tbody></table></div></div></section>
 <section id="admin" class="hide"><div id="login" class="card"><h2>🔐 Admin Login</h2><input id="pin" type="password" placeholder="Admin PIN"><br><br><button onclick="login()">Login</button><div id="loginMsg" class="msg"></div></div><div id="panel" class="hide">
-<div class="card"><h2>➕ নতুন ম্যাচ যোগ</h2><div class="grid"><select id="player"></select><input id="match" type="number" value="1" placeholder="Match"><input id="won" type="number" value="0" placeholder="Won"><input id="lost" type="number" value="0" placeholder="Lost"><input id="run" type="number" value="0" placeholder="Run"><input id="wicket" type="number" value="0" placeholder="Wicket"><input id="fifty" type="number" value="0" placeholder="50"><input id="hundred" type="number" value="0" placeholder="100"></div><br><button onclick="saveMatch()">Save Match</button><div id="saveMsg" class="msg"></div></div>
-<div class="card"><h2>👤 Player-এর ছবি</h2><select id="managePlayer" onchange="loadManagePhoto()"></select><div class="photoBox"><label>একজন Player বেছে ছবি দিন</label><input id="managePhoto" type="file" accept="image/*" onchange="previewManagePhoto()"><div id="managePhotoPreview" class="photoPreview"></div><br><button onclick="savePlayerPhoto()">ছবি সেভ করুন</button></div><div id="manageMsg" class="msg"></div></div><div class="card"><h2>👤 Player যোগ / মুছুন</h2><input id="newPlayer" placeholder="নতুন Player নাম"><br><br><button onclick="addPlayer()">Player যোগ করুন</button><br><br><button class="danger" onclick="deletePlayer()">Selected Player মুছে দিন</button><br><br><button class="danger" onclick="resetPlayer()">Selected Player-এর সব Stats Reset</button></div>
+<div class="card"><h2>➕ নতুন ম্যাচ যোগ</h2><div class="grid"><select id="player"></select><input id="match" type="number" value="1" placeholder="Match"><input id="won" type="number" value="0" placeholder="Won"><input id="lost" type="number" value="0" placeholder="Lost"><input id="run" type="number" value="0" placeholder="Run"><input id="wicket" type="number" value="0" placeholder="Wicket"><input id="fifty" type="number" value="0" placeholder="50"><input id="hundred" type="number" value="0" placeholder="100"></div><br><button onclick="saveMatch()">Save Match</button><div id="saveMsg" class="msg"></div></div><div class="card"><h2>✏️ ভুল Stats কমান</h2><p class="muted">ভুল করে বেশি লেখা হলে শুধু যতটুকু কমাতে চান সেটুকু লিখুন।</p><div class="grid"><select id="correctPlayer"></select><input id="correctMatch" type="number" min="0" value="0" placeholder="Match কমান"><input id="correctWon" type="number" min="0" value="0" placeholder="Win কমান"><input id="correctLost" type="number" min="0" value="0" placeholder="Lost কমান"><input id="correctRun" type="number" min="0" value="0" placeholder="Run কমান"><input id="correctWicket" type="number" min="0" value="0" placeholder="Wicket কমান"><input id="correctFifty" type="number" min="0" value="0" placeholder="50 কমান"><input id="correctHundred" type="number" min="0" value="0" placeholder="100 কমান"></div><br><button onclick="correctStats()">ভুল Stats কমান</button><div id="correctMsg" class="msg"></div></div>
+<div class="card"><h2>👤 Player যোগ / মুছুন</h2><input id="newPlayer" placeholder="নতুন Player নাম"><br><br><button onclick="addPlayer()">Player যোগ করুন</button><br><br><button class="danger" onclick="deletePlayer()">Selected Player মুছে দিন</button><br><br><button class="danger" onclick="resetPlayer()">Selected Player-এর সব Stats Reset</button></div>
 </div></section></div><script>
 const API='https://script.google.com/macros/s/AKfycbxCSeH5OjhjT5AoLZQEmtdE-gYf1hqetebhgZWrdBzFWGrD5sRVm_8h66N7x_mzLXTn/exec';let DATA={players:[]},PIN='';
 function show(id){['home','players','admin'].forEach(x=>document.getElementById(x).classList.toggle('hide',x!==id));['homeBtn','playersBtn','adminBtn'].forEach(x=>document.getElementById(x).classList.remove('active'));document.getElementById(id+'Btn').classList.add('active');}
@@ -36,16 +36,15 @@ document.getElementById('cards').innerHTML=DATA.players.map(p=>`
 document.getElementById('stats').innerHTML=DATA.players.map(p=>`<tr><td><b>${esc(p.name)}</b></td><td>${p.match}</td><td>${p.won}</td><td>${p.lost}</td><td>${p.match?(p.won/p.match*100).toFixed(2):'0.00'}%</td><td>${p.run}</td><td>${p.match?(p.run/p.match).toFixed(2):'0.00'}</td><td>${p.wicket}</td><td>${p.match?(p.wicket/p.match).toFixed(2):'0.00'}</td><td>${p.fifty}</td><td>${p.hundred}</td></tr>`).join('');
 const opts=DATA.players.map(p=>`<option>${esc(p.name)}</option>`).join('');
 document.getElementById('player').innerHTML=opts;
-document.getElementById('managePlayer').innerHTML=opts;
-if(DATA.players.length)loadManagePhoto()
+document.getElementById('correctPlayer').innerHTML=opts;
 }
 function login(){const p=document.getElementById('pin').value.trim();if(!p){document.getElementById('loginMsg').textContent='Admin PIN দিন';return}api({action:'checkPin',pin:p},x=>{if(x.ok){PIN=p;document.getElementById('login').classList.add('hide');document.getElementById('panel').classList.remove('hide');document.getElementById('loginMsg').textContent=''}else document.getElementById('loginMsg').textContent=x.error||'ভুল Admin PIN'})}
 function n(id){return Number(document.getElementById(id).value)||0}
 function saveMatch(){api({action:'save',pin:PIN,player:document.getElementById('player').value,match:n('match'),won:n('won'),lost:n('lost'),run:n('run'),wicket:n('wicket'),fifty:n('fifty'),hundred:n('hundred')},done('saveMsg'))}
 function addPlayer(){
 const name=document.getElementById('newPlayer').value.trim();
-if(!name){document.getElementById('manageMsg').textContent='Player name দিন';return}
-api({action:'addPlayer',pin:PIN,name:name},done('manageMsg'));
+if(!name){document.getElementById('saveMsg').textContent='Player name দিন';return}
+api({action:'addPlayer',pin:PIN,name:name},done('saveMsg'));
 }
 
 function photoSrc(photo,name){
@@ -54,89 +53,22 @@ function photoSrc(photo,name){
   const sep=photo.indexOf('?')>=0?'&':'?';
   return photo+sep+'v='+encodeURIComponent(photo.slice(-80));
 }
-function imageToDataUrl(file){
-  return new Promise(resolve=>{
-    if(!file){resolve('');return}
-    if(file.size>8*1024*1024){resolve('');return}
-    const r=new FileReader();
-    r.onload=()=>resolve(r.result);
-    r.onerror=()=>resolve('');
-    r.readAsDataURL(file);
+function correctStats(){
+  const name=document.getElementById('correctPlayer').value;
+  if(!name){document.getElementById('correctMsg').textContent='Player নির্বাচন করুন';return}
+  const values={
+    match:n('correctMatch'),won:n('correctWon'),lost:n('correctLost'),run:n('correctRun'),
+    wicket:n('correctWicket'),fifty:n('correctFifty'),hundred:n('correctHundred')
+  };
+  const total=Object.values(values).reduce((a,b)=>a+b,0);
+  if(total<=0){document.getElementById('correctMsg').textContent='কমপক্ষে একটি সংখ্যা দিন';return}
+  if(!confirm(name+' এর এই Stats কমাবেন?'))return;
+  api({action:'correct',pin:PIN,player:name,match:values.match,won:values.won,lost:values.lost,run:values.run,wicket:values.wicket,fifty:values.fifty,hundred:values.hundred},x=>{
+    document.getElementById('correctMsg').textContent=x.ok?(x.message||'সংশোধন হয়েছে ✅'):x.error;
+    if(x.ok){DATA=x;render();['correctMatch','correctWon','correctLost','correctRun','correctWicket','correctFifty','correctHundred'].forEach(id=>document.getElementById(id).value=0);}
   });
 }
-function readPhoto(file,cb){
-  if(!file){cb('');return}
-  if(file.size>8*1024*1024){cb('');return}
-  const r=new FileReader();
-  r.onload=()=>cb(r.result);
-  r.onerror=()=>cb('');
-  r.readAsDataURL(file);
-}
-
-function previewManagePhoto(){
-  const f=document.getElementById('managePhoto').files[0];
-  const box=document.getElementById('managePhotoPreview');
-  if(!f){loadManagePhoto();return}
-  const r=new FileReader();
-  r.onload=()=>box.innerHTML='<img src="'+r.result+'" alt="new preview"><span>ছবি নির্বাচিত</span>';
-  r.readAsDataURL(f);
-}
-function loadManagePhoto(){
-  const p=DATA.players.find(x=>x.name===document.getElementById('managePlayer').value);
-  const box=document.getElementById('managePhotoPreview');
-  if(p&&p.photo){
-    const sep=p.photo.indexOf('?')>=0?'&':'?';
-    box.innerHTML='<img src="'+p.photo+sep+'v='+encodeURIComponent(p.photo.slice(-80))+'" alt="photo">';
-  }else box.innerHTML='<span>ছবি নেই</span>';
-}
-async function savePlayerPhoto(){
-  const name=document.getElementById('managePlayer').value;
-  const file=document.getElementById('managePhoto').files[0];
-  if(!name){document.getElementById('manageMsg').textContent='Player নির্বাচন করুন';return}
-  if(!file){document.getElementById('manageMsg').textContent='ছবি নির্বাচন করুন';return}
-  document.getElementById('manageMsg').textContent='ছবি ছোট করে সেভ করা হচ্ছে...';
-  const photo=await compressPhoto(file);
-  if(!photo){document.getElementById('manageMsg').textContent='ছবি পড়তে সমস্যা হয়েছে';return}
-  savePhotoPost(name,photo);
-}
-
-function savePhotoPost(name,photo){
-  const msg=document.getElementById('manageMsg');
-  const old=(DATA.players.find(x=>x.name===name)||{}).photo||'';
-  msg.textContent='ছবি সেভ হচ্ছে...';
-  const iframe=document.createElement('iframe');
-  iframe.name='photoFrame_'+Date.now(); iframe.style.display='none'; document.body.appendChild(iframe);
-  const form=document.createElement('form'); form.method='POST'; form.action=API; form.target=iframe.name; form.style.display='none';
-  function add(k,v){const i=document.createElement('input');i.type='hidden';i.name=k;i.value=v;form.appendChild(i)}
-  add('action','updatePhoto'); add('pin',PIN); add('name',name); add('photo',photo);
-  document.body.appendChild(form); form.submit();
-
-  let tries=0;
-  const check=()=>{
-    tries++;
-    api({action:'get'},x=>{
-      if(x&&x.ok){
-        const p=x.players.find(q=>q.name===name);
-        if(p&&p.photo&&p.photo!==old){
-          DATA=x; render();
-          document.getElementById('managePlayer').value=name;
-          loadManagePhoto();
-          document.getElementById('managePhoto').value='';
-          msg.textContent='ছবি সেভ হয়েছে ✅';
-          try{iframe.remove();form.remove()}catch(e){}
-          return;
-        }
-      }
-      if(tries<12){
-        setTimeout(check,1200);
-      }else{
-        msg.textContent='ছবি সেভ নিশ্চিত করা যায়নি। আবার চেষ্টা করুন।';
-        try{iframe.remove();form.remove()}catch(e){}
-      }
-    });
-  };
-  setTimeout(check,1500);
-}function deletePlayer(){if(!confirm('এই Player সম্পূর্ণ মুছে ফেলবেন?'))return;api({action:'deletePlayer',pin:PIN,name:document.getElementById('managePlayer').value},done('manageMsg'))}
+function deletePlayer(){if(!confirm('এই Player সম্পূর্ণ মুছে ফেলবেন?'))return;api({action:'deletePlayer',pin:PIN,name:document.getElementById('managePlayer').value},done('manageMsg'))}
 function resetPlayer(){if(!confirm('এই Player-এর সব Stats 0 করে দেবেন?'))return;api({action:'resetPlayer',pin:PIN,name:document.getElementById('managePlayer').value},done('manageMsg'))}
 function done(id){return x=>{document.getElementById(id).textContent=x.ok?(x.message||'হয়ে গেছে ✅'):x.error;if(x.ok){DATA=x;render()}}}
 function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}

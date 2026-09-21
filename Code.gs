@@ -35,6 +35,7 @@ function api_(p){
     else if(action==='deletePlayer') result=deletePlayer_(p);
     else if(action==='resetPlayer') result=resetPlayer_(p);
     else if(action==='deleteHistory') result=deleteHistory_(p);
+    else if(action==='correct') result=correct_(p);
     else throw new Error('Unknown action');
   }catch(err){result={ok:false,error:String(err.message||err)}}
   const body=JSON.stringify(result),cb=p.callback;
@@ -59,6 +60,25 @@ function save_(p){
   sh.getRange(row,2,1,7).setValues([[cur[0]+m,cur[1]+w,cur[2]+l,cur[3]+r,cur[4]+wk,cur[5]+f,cur[6]+h]]);
   SpreadsheetApp.getActiveSpreadsheet().getSheetByName(HISTORY_SHEET).appendRow([Utilities.getUuid(),name,m,w,l,r,wk,f,h,new Date()]);
   return {ok:true,message:'সেভ হয়েছে',players:readPlayers_()};
+}
+function correct_(p){
+  auth_(p);
+  const name=String(p.player||'').trim();
+  if(!name)throw new Error('Player নির্বাচন করুন');
+  const sh=SpreadsheetApp.getActiveSpreadsheet().getSheetByName(STATS_SHEET);
+  const vals=sh.getDataRange().getValues();
+  let row=-1;
+  for(let i=1;i<vals.length;i++)if(String(vals[i][0])===name){row=i+1;break}
+  if(row<0)throw new Error('Player not found');
+  const sub=[num_(p.match),num_(p.won),num_(p.lost),num_(p.run),num_(p.wicket),num_(p.fifty),num_(p.hundred)];
+  if(sub.reduce((a,b)=>a+b,0)<=0)throw new Error('কমপক্ষে একটি সংখ্যা দিন');
+  const cur=sh.getRange(row,2,1,7).getValues()[0].map(Number);
+  for(let i=0;i<7;i++)if(sub[i]>cur[i])throw new Error('যত আছে তার চেয়ে বেশি কমানো যাবে না');
+  const next=cur.map((x,i)=>x-sub[i]);
+  sh.getRange(row,2,1,7).setValues([next]);
+  // Negative history entry keeps the correction reversible through History delete.
+  SpreadsheetApp.getActiveSpreadsheet().getSheetByName(HISTORY_SHEET).appendRow([Utilities.getUuid(),name,-sub[0],-sub[1],-sub[2],-sub[3],-sub[4],-sub[5],-sub[6],new Date()]);
+  return {ok:true,message:'ভুল Stats কমানো হয়েছে ✅',players:readPlayers_()};
 }
 function addPlayer_(p){
   auth_(p);const name=String(p.name||'').trim();if(!name)throw new Error('Player name দিন');

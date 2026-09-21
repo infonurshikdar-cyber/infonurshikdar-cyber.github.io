@@ -1,7 +1,9 @@
-FINAL PHOTO SYSTEM FIX
-1. GitHub Pages: replace only index.html.
-2. Apps Script: replace only Code.gs.
-3. Apps Script: Deploy > Manage deployments > Edit > New version > Deploy.
-Do not delete/change Stats or History data.
-The Photo column will be converted from old data:image... values to Drive thumbnail URLs automatically when the new Code.gs runs.
-New photos up to 8MB are saved without forced 1600px compression.
+এই ZIP-এ শুধু Admin Panel-এ ভুল Stats কমানোর ব্যবস্থা যোগ করা হয়েছে।
+
+ব্যবহার:
+1) GitHub-এর index.html-এর জায়গায় ZIP-এর index.html দিন।
+2) Apps Script-এর Code.gs-এর জায়গায় ZIP-এর Code.gs দিন।
+3) Apps Script নতুন version deploy করুন।
+4) Admin Panel-এ "✏️ ভুল Stats কমান" থেকে Player নির্বাচন করে যতটুকু কমাতে চান লিখুন।
+
+Google Sheet-এর বর্তমান Stats/History data মুছবেন না।
