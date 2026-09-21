@@ -112,8 +112,17 @@ function savePhotoToDrive_(dataUrl,name){
   const ext=mime==='image/png'?'png':(mime==='image/webp'?'webp':'jpg');
   const blob=Utilities.newBlob(bytes,mime,safe+'_'+Date.now()+'.'+ext);
   const file=DriveApp.createFile(blob);
-  try{file.setSharing(DriveApp.Access.ANYONE_WITH_LINK,DriveApp.Permission.VIEW);}catch(e){}
-  return 'https://drive.google.com/thumbnail?id='+file.getId()+'&sz=w2000';
+  try{
+    file.setSharing(DriveApp.Access.ANYONE_WITH_LINK,DriveApp.Permission.VIEW);
+  }catch(e){
+    try{file.setTrashed(true);}catch(ignore){}
+    throw new Error('ছবির Public access চালু করা যায়নি। Google Drive-এর Sharing সেটিংসে Anyone with the link → Viewer দিন।');
+  }
+  if(file.getSharingAccess()!==DriveApp.Access.ANYONE_WITH_LINK){
+    try{file.setTrashed(true);}catch(ignore){}
+    throw new Error('ছবির Public access চালু হয়নি। Google Drive-এর Sharing সেটিংসে Anyone with the link → Viewer দিন।');
+  }
+  return 'https://drive.google.com/thumbnail?id='+file.getId()+'&sz=w4000';
 }
 
 function deletePlayer_(p){

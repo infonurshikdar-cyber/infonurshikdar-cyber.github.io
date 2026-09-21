@@ -15,7 +15,7 @@ function render(){
 document.getElementById('cards').innerHTML=DATA.players.map(p=>`
 <div class="player">
   <div class="playerPhotoWrap">
-    <img class="playerPhoto" src="${photoSrc(p.photo,p.name)}" alt="${esc(p.name)}" loading="eager" decoding="auto" referrerpolicy="no-referrer">
+    <img class="playerPhoto" src="${photoSrc(p.photo,p.name)}" alt="${esc(p.name)}" loading="eager" decoding="auto" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='data:image/svg+xml;charset=UTF-8,'+encodeURIComponent('<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"600\" height=\"800\"><rect width=\"100%\" height=\"100%\" fill=\"#dce6f5\"/><text x=\"50%\" y=\"50%\" text-anchor=\"middle\" dominant-baseline=\"middle\" font-size=\"48\" fill=\"#164a9c\">'+String(this.alt||'Player').charAt(0).toUpperCase()+'</text></svg>')">
   </div>
   <div class="playerInfo">
     <div class="playerHead"><h3>${esc(p.name)}</h3></div>
@@ -41,7 +41,7 @@ api({action:'addPlayer',pin:PIN,name:name},x=>{if(!x.ok){document.getElementById
 function photoSrc(photo,name){if(photo){return photo+(photo.indexOf('?')>=0?'&':'?')+'v='+Date.now()}return 'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120"><rect width="120" height="120" fill="#dce6f5"/><text x="60" y="68" text-anchor="middle" font-size="44" fill="#164a9c">'+String(name||'?').charAt(0).toUpperCase()+'</text></svg>')}
 function imageToDataUrl(file){return new Promise(resolve=>{if(!file){resolve('');return}const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=()=>resolve('');r.readAsDataURL(file)})}
 function previewManagePhoto(){const f=document.getElementById('managePhoto').files[0];const box=document.getElementById('managePhotoPreview');if(!f){loadManagePhoto();return}const r=new FileReader();r.onload=()=>box.innerHTML='<img src="'+r.result+'" alt="new preview"><span>ছবি নির্বাচিত</span>';r.readAsDataURL(f)}
-function loadManagePhoto(){const p=DATA.players.find(x=>x.name===document.getElementById('managePlayer').value);document.getElementById('managePhotoPreview').innerHTML=p&&p.photo?'<img src="'+p.photo+(p.photo.indexOf('?')>=0?'&':'?')+'preview='+Date.now()+'" alt="photo" referrerpolicy="no-referrer">':'<span>ছবি নেই</span>'}
+function loadManagePhoto(){const p=DATA.players.find(x=>x.name===document.getElementById('managePlayer').value);document.getElementById('managePhotoPreview').innerHTML=p&&p.photo?'<img src="'+p.photo+(p.photo.indexOf('?')>=0?'&':'?')+'preview='+Date.now()+'" alt="photo" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='data:image/svg+xml;charset=UTF-8,'+encodeURIComponent('<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"600\" height=\"800\"><rect width=\"100%\" height=\"100%\" fill=\"#dce6f5\"/><text x=\"50%\" y=\"50%\" text-anchor=\"middle\" dominant-baseline=\"middle\" font-size=\"48\" fill=\"#164a9c\">'+String(this.alt||'Player').charAt(0).toUpperCase()+'</text></svg>')">':'<span>ছবি নেই</span>'}
 async function savePlayerPhoto(){
 const name=document.getElementById('managePlayer').value;const file=document.getElementById('managePhoto').files[0];
 if(!name){document.getElementById('manageMsg').textContent='Player নির্বাচন করুন';return}
