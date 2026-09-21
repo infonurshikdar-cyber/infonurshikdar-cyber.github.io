@@ -9,3 +9,6 @@
 7) পুরোনো Player-এর ছবি বদলাতে Manage Player থেকে Player নির্বাচন > Photo নির্বাচন > "ছবি সেভ করুন"।
 
 নোট: GitHub Pages শুধু frontend; Photo Save/Read Apps Script backend-এর মাধ্যমে হবে।
+
+
+UPDATED: index.html now uses the new Google Apps Script Web App URL supplied by the user and shows a large player photo on the left with all player stats on the right.
