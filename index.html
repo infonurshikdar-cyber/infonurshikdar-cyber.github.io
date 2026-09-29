@@ -1,58 +1,43 @@
 <!doctype html><html lang="bn"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#164a9c"><title>Cricket Stats</title><style>
-*{box-sizing:border-box}body{margin:0;font-family:Arial,"Noto Sans Bengali",sans-serif;background:#f1f4f8;color:#142033}header{background:#164a9c;color:#fff;text-align:center;padding:18px 10px}header h1{margin:0;font-size:26px}header p{margin:5px 0 0}.nav{background:#fff;padding:10px;display:flex;gap:8px;flex-wrap:wrap}.nav button{width:auto;background:#e7edf7;color:#123;border-radius:22px}.nav button.active{background:#164a9c;color:#fff}.wrap{max-width:1100px;margin:auto;padding:14px}.card{background:#fff;border-radius:14px;padding:16px;margin-bottom:14px;box-shadow:0 2px 12px #0001}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:9px}input,select,button{font:inherit;padding:10px;border:1px solid #ccd5e2;border-radius:9px;width:100%}button{background:#164a9c;color:#fff;border:0;font-weight:700;cursor:pointer}.danger{background:#b42318}.muted{color:#657286}.hide{display:none}.scroll{overflow:auto}table{border-collapse:collapse;width:100%;min-width:950px}th,td{border:1px solid #d7dee8;padding:8px;text-align:center}th{background:#e8eef7}.players{display:grid;grid-template-columns:repeat(2,minmax(360px,1fr));gap:14px}.player{background:#edf3ff;border-radius:14px;padding:14px;min-height:190px}.playerHead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}.playerHead h3{margin:0;font-size:21px;color:#123b78}.playerStats{display:grid;grid-template-columns:1fr 1fr;gap:6px 18px;font-size:14px}.playerStats div{padding:5px 0}.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}.sectionTitle{margin:0 0 8px}.actionMsg{margin-top:10px;font-weight:700}.modal{position:fixed;inset:0;background:#0008;display:flex;align-items:center;justify-content:center;padding:18px;z-index:9999}.modal.hide{display:none}.modalBox{background:#fff;border-radius:16px;max-width:460px;width:100%;padding:20px;box-shadow:0 10px 35px #0004}.modalBox h3{margin:0 0 12px}.confirmGrid{display:grid;grid-template-columns:1fr 1fr;gap:7px;background:#f1f4f8;border-radius:10px;padding:12px}.confirmGrid div{padding:4px 0}.modalBtns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}.modalBtns button.cancel{background:#657286}@media(max-width:900px){.players{grid-template-columns:1fr}}@media(max-width:600px){.two{grid-template-columns:1fr}.playerStats{grid-template-columns:1fr;font-size:13px}header h1{font-size:22px}}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,"Noto Sans Bengali",sans-serif;background:#f1f4f8;color:#142033}header{background:#164a9c;color:#fff;text-align:center;padding:18px 10px}header h1{margin:0;font-size:26px}header p{margin:5px 0 0}.nav{background:#fff;padding:10px;display:flex;gap:8px;flex-wrap:wrap}.nav button{width:auto;background:#e7edf7;color:#123;border-radius:22px}.nav button.active{background:#164a9c;color:#fff}.wrap{max-width:1100px;margin:auto;padding:14px}.card{background:#fff;border-radius:14px;padding:16px;margin-bottom:14px;box-shadow:0 2px 12px #0001}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:9px}input,select,button{font:inherit;padding:10px;border:1px solid #ccd5e2;border-radius:9px;width:100%}button{background:#164a9c;color:#fff;border:0;font-weight:700;cursor:pointer}button:disabled{opacity:.55;cursor:not-allowed}.saveState{margin-top:10px;font-weight:700}.modalBack{position:fixed;inset:0;background:#0008;display:flex;align-items:center;justify-content:center;z-index:9999;padding:16px}.modalBox{background:#fff;border-radius:14px;max-width:520px;width:100%;padding:18px;box-shadow:0 8px 30px #0004}.modalBox h3{margin:0 0 12px}.previewGrid{display:grid;grid-template-columns:1fr 1fr;gap:7px;background:#f3f6fa;border-radius:10px;padding:12px}.previewGrid div{padding:4px}.modalBtns{display:flex;gap:8px;margin-top:14px}.modalBtns button{flex:1}.modalCancel{background:#667085}.danger{background:#b42318}.muted{color:#657286}.hide{display:none}.scroll{overflow:auto}table{border-collapse:collapse;width:100%;min-width:950px}th,td{border:1px solid #d7dee8;padding:8px;text-align:center}th{background:#e8eef7}.players{display:grid;grid-template-columns:repeat(2,minmax(360px,1fr));gap:14px}.player{background:#edf3ff;border-radius:14px;padding:14px;min-height:190px}.playerHead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}.playerHead h3{margin:0;font-size:21px;color:#123b78}.playerStats{display:grid;grid-template-columns:1fr 1fr;gap:6px 18px;font-size:14px}.playerStats div{padding:5px 0}.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}.sectionTitle{margin:0 0 8px}.actionMsg{margin-top:10px;font-weight:700}@media(max-width:900px){.players{grid-template-columns:1fr}}@media(max-width:600px){.two{grid-template-columns:1fr}.playerStats{grid-template-columns:1fr;font-size:13px}header h1{font-size:22px}}
 </style></head><body><header><h1>🏏 Cricket Stats</h1><p>সকল খেলোয়াড়ের আপডেটেড পরিসংখ্যান</p></header><div class="nav"><button id="homeBtn" class="active" onclick="show('home')">Home</button><button id="playersBtn" onclick="show('players')">Players</button><button id="rankingBtn" onclick="show('ranking')">🏆 Ranking</button><button id="adminBtn" onclick="show('admin')">Admin</button></div><div class="wrap">
-<section id="home"><div class="card"><h2>Players</h2><div id="loadMsg" class="actionMsg muted">লোড হচ্ছে...</div><div id="cards" class="players"><div class="muted">লোড হচ্ছে...</div></div></div></section>
-<section id="players" class="hide"><div class="card"><h2>📊 সব Stats</h2><div class="scroll"><table><thead><tr><th>Rank</th><th>Player</th><th>Match</th><th>Won</th><th>Lost</th><th>Win Rate</th><th>Run</th><th>Run Avg</th><th>Wicket</th><th>Wicket Avg</th><th>50</th><th>100</th></tr></thead><tbody id="stats"></tbody></table></div></div></section>
-<section id="ranking" class="hide">
-<div class="card">
-<h2 class="sectionTitle">🏆 All-rounder Ranking</h2>
-<p class="muted">ব্যাটিং + বোলিং পারফরম্যান্সের ভিত্তিতে</p>
-<div class="scroll"><table style="min-width:0">
-<thead><tr><th>Rank</th><th>Player</th><th>Match</th><th>Run Avg</th><th>Wicket Avg</th><th>Run</th><th>Wicket</th></tr></thead>
-<tbody id="allRoundRank"></tbody>
-</table></div>
-</div>
-
-<div class="card">
-<h2 class="sectionTitle">🏏 Batting Ranking</h2>
-<p class="muted">Run Average, 50 ও 100-এর ভিত্তিতে</p>
-<div class="scroll"><table style="min-width:0">
-<thead><tr><th>Rank</th><th>Player</th><th>Match</th><th>Run Avg</th><th>Run</th><th>50</th><th>100</th></tr></thead>
-<tbody id="battingRank"></tbody>
-</table></div>
-</div>
-
-<div class="card">
-<h2 class="sectionTitle">🎳 Bowling Ranking</h2>
-<p class="muted">Wicket Average ও মোট Wicket-এর ভিত্তিতে</p>
-<div class="scroll"><table style="min-width:0">
-<thead><tr><th>Rank</th><th>Player</th><th>Match</th><th>Wicket Avg</th><th>Wicket</th></tr></thead>
-<tbody id="bowlingRank"></tbody>
-</table></div>
-</div>
-
-<div class="card">
-<h2 class="sectionTitle">🏆 Win Ranking</h2>
-<p class="muted">Win Average (Win ÷ Match)-এর ভিত্তিতে</p>
-<div class="scroll"><table style="min-width:0">
-<thead><tr><th>Rank</th><th>Player</th><th>Win</th><th>Match</th><th>Win Rate</th><th>Lost</th></tr></thead>
-<tbody id="winRank"></tbody>
-</table></div>
-</div>
-</section><section id="admin" class="hide"><div id="login" class="card"><h2>🔐 Admin Login</h2><input id="pin" type="password" placeholder="Admin PIN"><br><br><button onclick="login()">Login</button><div id="loginMsg" class="actionMsg"></div></div><div id="panel" class="hide">
-<div class="card"><h2>➕ নতুন ম্যাচ যোগ</h2><div class="grid"><select id="player"></select><input id="match" type="number" min="0" value="1" placeholder="Match"><input id="won" type="number" min="0" value="0" placeholder="Won"><input id="lost" type="number" min="0" value="0" placeholder="Lost"><input id="run" type="number" min="0" value="0" placeholder="Run"><input id="wicket" type="number" min="0" value="0" placeholder="Wicket"><input id="fifty" type="number" min="0" value="0" placeholder="50"><input id="hundred" type="number" min="0" value="0" placeholder="100"></div><br><button onclick="saveMatch()">Save Match</button><div id="saveMsg" class="actionMsg"></div></div>
-<div class="card"><h2>✏️ ভুল ডেটা ঠিক করুন</h2><p class="muted">কোনো Player-এর Stats ভুল হলে এখানে বেছে নিয়ে বাড়াতে বা কমাতে পারবেন।</p><div class="grid"><select id="adjustPlayer"></select><select id="adjustMode"><option value="add">বাড়াতে</option><option value="subtract">কমাতে</option></select><input id="adjustMatch" type="number" min="0" value="0" placeholder="Match"><input id="adjustWon" type="number" min="0" value="0" placeholder="Win"><input id="adjustLost" type="number" min="0" value="0" placeholder="Lost"><input id="adjustRun" type="number" min="0" value="0" placeholder="Run"><input id="adjustWicket" type="number" min="0" value="0" placeholder="Wicket"><input id="adjustFifty" type="number" min="0" value="0" placeholder="50"><input id="adjustHundred" type="number" min="0" value="0" placeholder="100"></div><br><button onclick="adjustStats()">Stats পরিবর্তন করুন</button><div id="adjustMsg" class="actionMsg"></div></div>
+<section id="home"><div class="card"><h2>Players</h2><div id="cards" class="players"><div class="muted">লোড হচ্ছে...</div></div></div></section>
+<section id="players" class="hide"><div class="card"><h2>📊 সব Stats</h2><div class="scroll"><table><thead><tr><th>Player</th><th>Match</th><th>Won</th><th>Lost</th><th>Win Rate</th><th>Run</th><th>Run Avg</th><th>Wicket</th><th>Wicket Avg</th><th>50</th><th>100</th></tr></thead><tbody id="stats"></tbody></table></div></div></section>
+<section id="ranking" class="hide"><div class="card"><h2 class="sectionTitle">🏆 Ranking</h2><div style="display:flex;gap:8px;flex-wrap:wrap;margin:12px 0"><button id="rankAllBtn" class="active" onclick="showRank('all')">🏆 All-rounder Ranking</button><button id="rankBatBtn" onclick="showRank('bat')">🏏 Batting Ranking</button><button id="rankBowlBtn" onclick="showRank('bowl')">🎳 Bowling Ranking</button><button id="rankWinBtn" onclick="showRank('win')">🏆 Win Ranking</button></div><div id="rankAll" class="rankBox"><p class="muted">ব্যাটিং + বোলিং + জয়ের পারফরম্যান্স মিলিয়ে</p><div class="scroll"><table style="min-width:0"><thead><tr><th>Rank</th><th>Player</th><th>Match</th><th>Run Avg</th><th>Wicket Avg</th><th>Win Rate</th><th>Run</th><th>Wicket</th></tr></thead><tbody id="allRoundRank"></tbody></table></div></div><div id="rankBat" class="rankBox hide"><p class="muted">Run Average, 50 ও 100-এর ভিত্তিতে</p><div class="scroll"><table style="min-width:0"><thead><tr><th>Rank</th><th>Player</th><th>Match</th><th>Run Avg</th><th>Run</th><th>50</th><th>100</th></tr></thead><tbody id="battingRank"></tbody></table></div></div><div id="rankBowl" class="rankBox hide"><p class="muted">Wicket Average ও মোট Wicket-এর ভিত্তিতে</p><div class="scroll"><table style="min-width:0"><thead><tr><th>Rank</th><th>Player</th><th>Wicket Avg</th><th>Wicket</th><th>Match</th></tr></thead><tbody id="bowlingRank"></tbody></table></div></div><div id="rankWin" class="rankBox hide"><p class="muted">সবচেয়ে বেশি ম্যাচ জয়ের ভিত্তিতে</p><div class="scroll"><table style="min-width:0"><thead><tr><th>Rank</th><th>Player</th><th>Win</th><th>Match</th><th>Win Rate</th><th>Lost</th></tr></thead><tbody id="winRank"></tbody></table></div></div></div></section><section id="admin" class="hide"><div id="login" class="card"><h2>🔐 Admin Login</h2><input id="pin" type="password" placeholder="Admin PIN"><br><br><button onclick="login()">Login</button><div id="loginMsg" class="actionMsg"></div></div><div id="panel" class="hide">
+<div class="card"><h2>➕ নতুন ম্যাচ যোগ</h2><div class="grid"><select id="player"></select><input id="match" type="number" min="0" value="1" placeholder="Match"><input id="won" type="number" min="0" value="0" placeholder="Won"><input id="lost" type="number" min="0" value="0" placeholder="Lost"><input id="run" type="number" min="0" value="0" placeholder="Run"><input id="wicket" type="number" min="0" value="0" placeholder="Wicket"><input id="fifty" type="number" min="0" value="0" placeholder="50"><input id="hundred" type="number" min="0" value="0" placeholder="100"></div><br><button id="saveMatchBtn" onclick="saveMatch()">Save Match</button><div id="saveMsg" class="actionMsg"></div></div>
+<div class="card"><h2>✏️ ভুল ডেটা ঠিক করুন</h2><p class="muted">কোনো Player-এর Stats ভুল হলে এখানে বেছে নিয়ে বাড়াতে বা কমাতে পারবেন।</p><div class="grid"><select id="adjustPlayer"></select><select id="adjustMode"><option value="add">বাড়াতে</option><option value="subtract">কমাতে</option></select><input id="adjustMatch" type="number" min="0" value="0" placeholder="Match"><input id="adjustWon" type="number" min="0" value="0" placeholder="Win"><input id="adjustLost" type="number" min="0" value="0" placeholder="Lost"><input id="adjustRun" type="number" min="0" value="0" placeholder="Run"><input id="adjustWicket" type="number" min="0" value="0" placeholder="Wicket"><input id="adjustFifty" type="number" min="0" value="0" placeholder="50"><input id="adjustHundred" type="number" min="0" value="0" placeholder="100"></div><br><button id="adjustStatsBtn" onclick="adjustStats()">Stats পরিবর্তন করুন</button><div id="adjustMsg" class="actionMsg"></div></div>
 <div class="card"><h2>👤 Player যোগ / মুছুন</h2><input id="newPlayer" placeholder="নতুন Player নাম"><br><br><button onclick="addPlayer()">Player যোগ করুন</button><br><br><button class="danger" onclick="deletePlayer()">Selected Player মুছে দিন</button><br><br><button class="danger" onclick="resetPlayer()">Selected Player-এর সব Stats Reset</button><div id="manageMsg" class="actionMsg"></div></div>
-</div></section></div><div id="confirmModal" class="modal hide"><div class="modalBox"><h3 id="confirmTitle">আপনি যা দিয়েছেন</h3><div id="confirmBody" class="confirmGrid"></div><div class="modalBtns"><button class="cancel" onclick="closeConfirm()">বাতিল</button><button onclick="confirmAction()">OK — সেভ করুন</button></div></div></div>
-<script>
+</div></section></div><script>
 const API='https://script.google.com/macros/s/AKfycbxCSeH5OjhjT5AoLZQEmtdE-gYf1hqetebhgZWrdBzFWGrD5sRVm_8h66N7x_mzLXTn/exec';let DATA={players:[]},PIN='';
 function show(id){['home','players','ranking','admin'].forEach(x=>document.getElementById(x).classList.toggle('hide',x!==id));['homeBtn','playersBtn','rankingBtn','adminBtn'].forEach(x=>document.getElementById(x).classList.remove('active'));document.getElementById(id+'Btn').classList.add('active');if(id==='ranking')renderRanking()}
-function api(params,cb){const s=document.createElement('script');const c='cb'+Date.now()+Math.floor(Math.random()*10000);let done=false;params.api='1';params.callback=c;const finish=(x)=>{if(done)return;done=true;delete window[c];s.remove();cb(x)};window[c]=finish;s.onerror=()=>finish({ok:false,error:'Backend connection failed'});s.src=API+'?'+new URLSearchParams(params).toString();document.body.appendChild(s)}
-function load(){
- const cached=localStorage.getItem('cricketStatsCache');
- if(cached){try{const x=JSON.parse(cached);if(x&&Array.isArray(x.players)){DATA=x;render();document.getElementById('loadMsg').textContent='সর্বশেষ ডাটা দেখাচ্ছে • আপডেট চেক হচ্ছে...';}}catch(e){}}
- api({action:'get'},x=>{if(!x.ok){document.getElementById('loadMsg').textContent=cached?'ইন্টারনেট/সার্ভার ধীর — আগের ডাটা দেখানো হচ্ছে':'Backend সংযোগ হচ্ছে না। Apps Script deployment ঠিক আছে কি না দেখুন।';if(!cached)document.getElementById('cards').innerHTML='<div>Backend সংযোগ হচ্ছে না। Apps Script deployment ঠিক আছে কি না দেখুন।</div>';return}DATA=x;localStorage.setItem('cricketStatsCache',JSON.stringify(x));render();document.getElementById('loadMsg').textContent='সর্বশেষ ডাটা আপডেট হয়েছে ✅'})
+let API_BUSY=false;
+function api(params,cb){
+ if(API_BUSY){cb({ok:false,error:'একটি কাজ এখনো চলছে। একটু অপেক্ষা করুন।'});return}
+ API_BUSY=true;
+ const s=document.createElement('script');
+ const c='cb'+Date.now()+Math.floor(Math.random()*10000);
+ params.api='1';params.callback=c;
+ let finished=false;
+ const finish=(x)=>{if(finished)return;finished=true;API_BUSY=false;delete window[c];try{s.remove()}catch(e){}cb(x)};
+ window[c]=(x)=>finish(x);
+ s.onerror=()=>finish({ok:false,error:'Backend connection failed'});
+ s.src=API+'?'+new URLSearchParams(params).toString();
+ document.body.appendChild(s);
 }
+
+function cacheSave(){try{localStorage.setItem('cricket_stats_cache',JSON.stringify(DATA))}catch(e){}}
+function cacheLoad(){try{const x=JSON.parse(localStorage.getItem('cricket_stats_cache')||'null');if(x&&Array.isArray(x.players)){DATA=x;render();return true}}catch(e){}return false}
+function setBusy(id,busy,text){const b=document.getElementById(id);if(b){b.disabled=busy;b.dataset.oldText=b.dataset.oldText||b.textContent;if(text)b.textContent=text;else b.textContent=b.dataset.oldText}}
+function showPreview(title,items,onOk){
+ const old=document.getElementById('actionModal');if(old)old.remove();
+ const back=document.createElement('div');back.id='actionModal';back.className='modalBack';
+ back.innerHTML='<div class="modalBox"><h3>'+esc(title)+'</h3><div class="previewGrid">'+items.map(([k,v])=>'<div><b>'+esc(k)+'</b>: '+esc(v)+'</div>').join('')+'</div><div class="modalBtns"><button class="modalCancel" id="modalCancel">বাতিল</button><button id="modalOk">OK — সেভ করুন</button></div></div>';
+ document.body.appendChild(back);
+ document.getElementById('modalCancel').onclick=()=>back.remove();
+ document.getElementById('modalOk').onclick=()=>{back.remove();onOk()};
+}
+
+function load(){const hadCache=cacheLoad();api({action:'get'},x=>{if(!x.ok){if(!hadCache)document.getElementById('cards').innerHTML='<div>Backend সংযোগ হচ্ছে না। পরে আবার চেষ্টা করুন।</div>';return}DATA=x;cacheSave();render()})}
 function overallScore(p){
  const m=Math.max(1,p.match||0);
  const winRate=(p.won||0)/m;
@@ -68,157 +53,60 @@ function overallScore(p){
 
 function render(){
  const ranked=[...DATA.players].sort((a,b)=>overallScore(b)-overallScore(a));
- document.getElementById('cards').innerHTML=ranked.map((p,i)=>`<div class="player"><div class="playerHead"><h3>#${i+1} ${esc(p.name)}</h3></div><div class="playerStats"><div>🏆 Match: ${p.match}</div><div>✅ Win: ${p.won}</div><div>❌ Lost: ${p.lost}</div><div>🏃 Run: ${p.run}</div><div>📈 Win Rate: ${p.match?(p.won/p.match*100).toFixed(1):'0.0'}%</div><div>🏏 Batting Average: ${p.match?(p.run/p.match).toFixed(2):'0.00'}</div><div>🎯 Wicket Average: ${p.match?(p.wicket/p.match).toFixed(2):'0.00'}</div><div>⚾ Wicket: ${p.wicket}</div><div>⭐ 50: ${p.fifty}</div><div>⭐ 100: ${p.hundred}</div></div></div>`).join('');
- document.getElementById('stats').innerHTML=ranked.map((p,i)=>`<tr><td><b>${i+1}</b></td><td><b>${esc(p.name)}</b></td><td>${p.match}</td><td>${p.won}</td><td>${p.lost}</td><td>${p.match?(p.won/p.match*100).toFixed(2):'0.00'}%</td><td>${p.run}</td><td>${p.match?(p.run/p.match).toFixed(2):'0.00'}</td><td>${p.wicket}</td><td>${p.match?(p.wicket/p.match).toFixed(2):'0.00'}</td><td>${p.fifty}</td><td>${p.hundred}</td></tr>`).join('');
+ document.getElementById('cards').innerHTML=ranked.map(p=>`<div class="player"><div class="playerHead"><h3>${esc(p.name)}</h3></div><div class="playerStats"><div>🏆 Match: ${p.match}</div><div>✅ Win: ${p.won}</div><div>❌ Lost: ${p.lost}</div><div>🏃 Run: ${p.run}</div><div>📈 Win Rate: ${p.match?(p.won/p.match*100).toFixed(1):'0.0'}%</div><div>🏏 Batting Average: ${p.match?(p.run/p.match).toFixed(2):'0.00'}</div><div>🎯 Wicket Average: ${p.match?(p.wicket/p.match).toFixed(2):'0.00'}</div><div>⚾ Wicket: ${p.wicket}</div><div>⭐ 50: ${p.fifty}</div><div>⭐ 100: ${p.hundred}</div></div></div>`).join('');
+ document.getElementById('stats').innerHTML=ranked.map(p=>`<tr><td><b>${esc(p.name)}</b></td><td>${p.match}</td><td>${p.won}</td><td>${p.lost}</td><td>${p.match?(p.won/p.match*100).toFixed(2):'0.00'}%</td><td>${p.run}</td><td>${p.match?(p.run/p.match).toFixed(2):'0.00'}</td><td>${p.wicket}</td><td>${p.match?(p.wicket/p.match).toFixed(2):'0.00'}</td><td>${p.fifty}</td><td>${p.hundred}</td></tr>`).join('');
+ renderRanking();
  const opts=DATA.players.map(p=>`<option value="${esc(p.name)}">${esc(p.name)}</option>`).join('');document.getElementById('player').innerHTML=opts;document.getElementById('adjustPlayer').innerHTML=opts;
 }
 function showRank(type){
-  // Ranking sections are displayed together; kept for compatibility.
+ ['all','bat','bowl','win'].forEach(x=>{document.getElementById('rank'+(x==='all'?'All':x==='bat'?'Bat':x==='bowl'?'Bowl':'Win')).classList.toggle('hide',x!==type);document.getElementById('rank'+(x==='all'?'All':x==='bat'?'Bat':x==='bowl'?'Bowl':'Win')+'Btn').classList.toggle('active',x===type)});
 }
-
 function renderRanking(){
-  const ps=[...DATA.players];
-
-  const safeMatch=p=>Math.max(1,Number(p.match)||0);
-  const runAvg=p=>(Number(p.run)||0)/safeMatch(p);
-  const wicketAvg=p=>(Number(p.wicket)||0)/safeMatch(p);
-  const fiftyRate=p=>(Number(p.fifty)||0)/safeMatch(p);
-  const hundredRate=p=>(Number(p.hundred)||0)/safeMatch(p);
-
-  const maxOf=fn=>Math.max(...ps.map(fn),0);
-  const maxRunAvg=maxOf(runAvg);
-  const maxWicketAvg=maxOf(wicketAvg);
-  const maxFiftyRate=maxOf(fiftyRate);
-  const maxHundredRate=maxOf(hundredRate);
-  const maxRun=maxOf(p=>Number(p.run)||0);
-  const maxWickets=maxOf(p=>Number(p.wicket)||0);
-
-  const norm=(value,max)=>max>0?value/max:0;
-
-  const batScore=p =>
-    norm(runAvg(p),maxRunAvg)*0.75+
-    norm(fiftyRate(p),maxFiftyRate)*0.10+
-    norm(hundredRate(p),maxHundredRate)*0.15;
-
-  const bowlScore=p =>
-    norm(wicketAvg(p),maxWicketAvg)*0.70+
-    norm(Number(p.wicket)||0,maxWickets)*0.30;
-
-  // All-rounder ONLY depends on batting + bowling.
-  const allScore=p =>
-    batScore(p)*0.50+
-    bowlScore(p)*0.50;
-
-  const all=[...ps].sort((a,b)=>
-    allScore(b)-allScore(a) ||
-    batScore(b)-batScore(a) ||
-    bowlScore(b)-bowlScore(a) ||
-    runAvg(b)-runAvg(a) ||
-    wicketAvg(b)-wicketAvg(a)
-  );
-
-  const bat=[...ps].sort((a,b)=>
-    batScore(b)-batScore(a) ||
-    runAvg(b)-runAvg(a) ||
-    (Number(b.run)||0)-(Number(a.run)||0)
-  );
-
-  const bowl=[...ps].sort((a,b)=>
-    bowlScore(b)-bowlScore(a) ||
-    wicketAvg(b)-wicketAvg(a) ||
-    (Number(b.wicket)||0)-(Number(a.wicket)||0)
-  );
-
-  const wins=[...ps].sort((a,b)=>
-    ((Number(b.won)||0)/safeMatch(b))-((Number(a.won)||0)/safeMatch(a)) ||
-    (Number(b.won)||0)-(Number(a.won)||0) ||
-    (Number(b.match)||0)-(Number(a.match)||0) ||
-    (Number(a.lost)||0)-(Number(b.lost)||0)
-  );
-
-  document.getElementById("allRoundRank").innerHTML=all.map((p,i)=>`
-    <tr>
-      <td><b>${i+1}</b></td>
-      <td><b>${esc(p.name)}</b></td>
-      <td>${Number(p.match)||0}</td>
-      <td>${runAvg(p).toFixed(2)}</td>
-      <td>${wicketAvg(p).toFixed(2)}</td>
-      <td>${Number(p.run)||0}</td>
-      <td>${Number(p.wicket)||0}</td>
-    </tr>`).join("");
-
-  document.getElementById("battingRank").innerHTML=bat.map((p,i)=>`
-    <tr>
-      <td><b>${i+1}</b></td>
-      <td><b>${esc(p.name)}</b></td>
-      <td>${Number(p.match)||0}</td>
-      <td>${runAvg(p).toFixed(2)}</td>
-      <td>${Number(p.run)||0}</td>
-      <td>${Number(p.fifty)||0}</td>
-      <td>${Number(p.hundred)||0}</td>
-    </tr>`).join("");
-
-  document.getElementById("bowlingRank").innerHTML=bowl.map((p,i)=>`
-    <tr>
-      <td><b>${i+1}</b></td>
-      <td><b>${esc(p.name)}</b></td>
-      <td>${Number(p.match)||0}</td>
-      <td>${wicketAvg(p).toFixed(2)}</td>
-      <td>${Number(p.wicket)||0}</td>
-    </tr>`).join("");
-
-  document.getElementById("winRank").innerHTML=wins.map((p,i)=>`
-    <tr>
-      <td><b>${i+1}</b></td>
-      <td><b>${esc(p.name)}</b></td>
-      <td>${Number(p.won)||0}</td>
-      <td>${Number(p.match)||0}</td>
-      <td>${(safeMatch(p)?((Number(p.won)||0)/safeMatch(p)*100):0).toFixed(1)}%</td>
-      <td>${Number(p.lost)||0}</td>
-    </tr>`).join("");
+ const ps=[...DATA.players];
+ const maxRunAvg=Math.max(...ps.map(p=>p.match?(p.run||0)/p.match:0),0);
+ const maxFiftyRate=Math.max(...ps.map(p=>p.match?(p.fifty||0)/p.match:0),0);
+ const maxHundredRate=Math.max(...ps.map(p=>p.match?(p.hundred||0)/p.match:0),0);
+ const maxWinRate=Math.max(...ps.map(p=>p.match?(p.won||0)/p.match:0),0);
+ const maxRun=Math.max(...ps.map(p=>p.run||0),0);
+ const maxWicketAvg=Math.max(...ps.map(p=>p.match?(p.wicket||0)/p.match:0),0);
+ const maxWickets=Math.max(...ps.map(p=>p.wicket||0),0);
+ const batScore=p=>{const m=Math.max(1,p.match||0),ra=(p.run||0)/m,fr=(p.fifty||0)/m,hr=(p.hundred||0)/m;return (maxRunAvg?ra/maxRunAvg:0)*0.75+(maxFiftyRate?fr/maxFiftyRate:0)*0.10+(maxHundredRate?hr/maxHundredRate:0)*0.15};
+ const bowlScore=p=>{const m=Math.max(1,p.match||0),wa=(p.wicket||0)/m,w=p.wicket||0;return (maxWicketAvg?wa/maxWicketAvg:0)*0.70+(maxWickets?w/maxWickets:0)*0.30};
+ const winScore=p=>maxWinRate?((p.won||0)/Math.max(1,p.match||0))/maxWinRate:0;
+ const allScore=p=>batScore(p)*0.40+bowlScore(p)*0.40+winScore(p)*0.20;
+ const all=[...ps].sort((a,b)=>allScore(b)-allScore(a)||batScore(b)-batScore(a)||bowlScore(b)-bowlScore(a));
+ const bat=[...ps].sort((a,b)=>batScore(b)-batScore(a)||((b.run||0)-(a.run||0)));
+ const bowl=[...ps].sort((a,b)=>bowlScore(b)-bowlScore(a)||((b.wicket||0)-(a.wicket||0)));
+ const wins=[...ps].sort((a,b)=>(b.won||0)-(a.won||0)||((b.match||0)-(a.match||0))||((a.lost||0)-(b.lost||0)));
+ document.getElementById('allRoundRank').innerHTML=all.map((p,i)=>`<tr><td><b>${i+1}</b></td><td><b>${esc(p.name)}</b></td><td>${p.match}</td><td>${p.match?(p.run/p.match).toFixed(2):'0.00'}</td><td>${p.match?(p.wicket/p.match).toFixed(2):'0.00'}</td><td>${p.match?(p.won/p.match*100).toFixed(1):'0.0'}%</td><td>${p.run}</td><td>${p.wicket}</td></tr>`).join('');
+ document.getElementById('battingRank').innerHTML=bat.map((p,i)=>`<tr><td><b>${i+1}</b></td><td><b>${esc(p.name)}</b></td><td>${p.match}</td><td>${p.match?(p.run/p.match).toFixed(2):'0.00'}</td><td>${p.run}</td><td>${p.fifty}</td><td>${p.hundred}</td></tr>`).join('');
+ document.getElementById('bowlingRank').innerHTML=bowl.map((p,i)=>`<tr><td><b>${i+1}</b></td><td><b>${esc(p.name)}</b></td><td>${p.match?(p.wicket/p.match).toFixed(2):'0.00'}</td><td>${p.wicket}</td><td>${p.match}</td></tr>`).join('');
+ document.getElementById('winRank').innerHTML=wins.map((p,i)=>`<tr><td><b>${i+1}</b></td><td><b>${esc(p.name)}</b></td><td>${p.won}</td><td>${p.match}</td><td>${p.match?(p.won/p.match*100).toFixed(1):'0.0'}%</td><td>${p.lost}</td></tr>`).join('');
+ showRank('all');
 }
 
 function login(){const p=document.getElementById('pin').value.trim();if(!p){document.getElementById('loginMsg').textContent='Admin PIN দিন';return}api({action:'checkPin',pin:p},x=>{if(x.ok){PIN=p;document.getElementById('login').classList.add('hide');document.getElementById('panel').classList.remove('hide');document.getElementById('loginMsg').textContent=''}else document.getElementById('loginMsg').textContent=x.error||'ভুল Admin PIN'})}
 function n(id){const v=Number(document.getElementById(id).value);return Number.isFinite(v)&&v>=0?v:0}
-let pendingAction=null;
-function valLabel(k){return {match:'Match',won:'Win',lost:'Lost',run:'Run',wicket:'Wicket',fifty:'50',hundred:'100'}[k]||k}
-function openConfirm(title, items, action){
-  const body=document.getElementById('confirmBody');
-  body.innerHTML=items.map(([k,v])=>`<div><b>${esc(valLabel(k))}:</b> ${esc(v)}</div>`).join('');
-  document.getElementById('confirmTitle').textContent=title;
-  pendingAction=action;
-  document.getElementById('confirmModal').classList.remove('hide');
-}
-function closeConfirm(){pendingAction=null;document.getElementById('confirmModal').classList.add('hide')}
-function confirmAction(){const fn=pendingAction;pendingAction=null;document.getElementById('confirmModal').classList.add('hide');if(fn)fn()}
 function saveMatch(){
- const player=document.getElementById('player').value;
- const values={match:n('match'),won:n('won'),lost:n('lost'),run:n('run'),wicket:n('wicket'),fifty:n('fifty'),hundred:n('hundred')};
- openConfirm(`${player} — নতুন ম্যাচের তথ্য`, Object.entries(values), ()=>{
-   const btn=document.querySelector('button[onclick="saveMatch()"]');const msg=document.getElementById('saveMsg');
-   if(btn)btn.disabled=true;msg.textContent='সেভ হচ্ছে... ⏳';
-   api({action:'save',pin:PIN,player,match:values.match,won:values.won,lost:values.lost,run:values.run,wicket:values.wicket,fifty:values.fifty,hundred:values.hundred},x=>{
-     if(btn)btn.disabled=false;msg.textContent=x.ok?(x.message||'এখানে সেভ হয়েছে ✅'):('সেভ হয়নি: '+(x.error||'সমস্যা হয়েছে'));
-     if(x.ok){DATA=x;localStorage.setItem('cricketStatsCache',JSON.stringify(x));render();document.getElementById('loadMsg').textContent='সর্বশেষ ডাটা আপডেট হয়েছে ✅'}
-   });
+ const vals={player:document.getElementById('player').value,match:n('match'),won:n('won'),lost:n('lost'),run:n('run'),wicket:n('wicket'),fifty:n('fifty'),hundred:n('hundred')};
+ showPreview('নতুন ম্যাচ সেভ করার আগে দেখুন',[['Player',vals.player],['Match',vals.match],['Win',vals.won],['Lost',vals.lost],['Run',vals.run],['Wicket',vals.wicket],['50',vals.fifty],['100',vals.hundred]],()=>{
+  setBusy('saveMatchBtn',true,'সেভ হচ্ছে...');document.getElementById('saveMsg').textContent='সেভ হচ্ছে... ⏳';
+  api({action:'save',pin:PIN,...vals},x=>{setBusy('saveMatchBtn',false);document.getElementById('saveMsg').textContent=x.ok?(x.message||'সেভ হয়েছে ✅'):x.error||'সেভ হয়নি';if(x.ok){DATA=x;cacheSave();render()}});
  });
 }
 function adjustStats(){
  const name=document.getElementById('adjustPlayer').value;const mode=document.getElementById('adjustMode').value;
  const values={match:n('adjustMatch'),won:n('adjustWon'),lost:n('adjustLost'),run:n('adjustRun'),wicket:n('adjustWicket'),fifty:n('adjustFifty'),hundred:n('adjustHundred')};
  if(Object.values(values).every(v=>v===0)){document.getElementById('adjustMsg').textContent='কমপক্ষে একটি সংখ্যা দিন';return}
- openConfirm(`${name} — ${mode==='add'?'বাড়ানোর':'কমানোর'} তথ্য`, Object.entries(values).filter(([,v])=>v!==0), ()=>{
-   document.getElementById('adjustMsg').textContent='সেভ হচ্ছে... ⏳';
-   api({action:'adjustStats',pin:PIN,player:name,mode,match:values.match,won:values.won,lost:values.lost,run:values.run,wicket:values.wicket,fifty:values.fifty,hundred:values.hundred},x=>{
-     document.getElementById('adjustMsg').textContent=x.ok?(x.message||'সংশোধন সেভ হয়েছে ✅'):x.error||'সেভ হয়নি';
-     if(x.ok){DATA=x;localStorage.setItem('cricketStatsCache',JSON.stringify(x));render();document.getElementById('loadMsg').textContent='সর্বশেষ ডাটা আপডেট হয়েছে ✅';['adjustMatch','adjustWon','adjustLost','adjustRun','adjustWicket','adjustFifty','adjustHundred'].forEach(id=>document.getElementById(id).value=0)}
-   });
+ showPreview('Stats পরিবর্তনের আগে দেখুন',[['Player',name],['কাজ',mode==='add'?'বাড়াতে':'কমাতে'],['Match',values.match],['Win',values.won],['Lost',values.lost],['Run',values.run],['Wicket',values.wicket],['50',values.fifty],['100',values.hundred]],()=>{
+  setBusy('adjustStatsBtn',true,'সেভ হচ্ছে...');document.getElementById('adjustMsg').textContent='সেভ হচ্ছে... ⏳';
+  api({action:'adjustStats',pin:PIN,player:name,mode:mode,...values},x=>{setBusy('adjustStatsBtn',false);document.getElementById('adjustMsg').textContent=x.ok?(x.message||'সেভ হয়েছে ✅'):x.error||'সেভ হয়নি';if(x.ok){DATA=x;cacheSave();render();['adjustMatch','adjustWon','adjustLost','adjustRun','adjustWicket','adjustFifty','adjustHundred'].forEach(id=>document.getElementById(id).value=0)}});
  });
 }
 function addPlayer(){const name=document.getElementById('newPlayer').value.trim();if(!name){document.getElementById('manageMsg').textContent='Player name দিন';return}api({action:'addPlayer',pin:PIN,name:name},done('manageMsg'))}
 function deletePlayer(){const name=document.getElementById('player').value;if(!name)return;if(!confirm('এই Player সম্পূর্ণ মুছে ফেলবেন?'))return;api({action:'deletePlayer',pin:PIN,name:name},done('manageMsg'))}
 function resetPlayer(){const name=document.getElementById('player').value;if(!name)return;if(!confirm('এই Player-এর সব Stats 0 করে দেবেন?'))return;api({action:'resetPlayer',pin:PIN,name:name},done('manageMsg'))}
-function done(id){return x=>{document.getElementById(id).textContent=x.ok?(x.message||'হয়ে গেছে ✅'):x.error;if(x.ok){DATA=x;render()}}}
+function done(id){return x=>{document.getElementById(id).textContent=x.ok?(x.message||'হয়ে গেছে ✅'):x.error;if(x.ok){DATA=x;cacheSave();render()}}}
 function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 load();
 </script></body></html>
