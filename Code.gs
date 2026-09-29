@@ -1,129 +1,1139 @@
-const STATS_SHEET='Stats';
-const HISTORY_SHEET='History';
-const ADMIN_PIN='44990';
+/*************************************************
+ * CRICKET STATS - GOOGLE APPS SCRIPT BACKEND
+ * Supports:
+ * - Stats
+ * - History
+ * - New Match
+ * - Add Player
+ * - Adjust Stats
+ * - Delete Player
+ * - Reset Player
+ * - Delete History
+ * - Hat-trick
+ * - Highest Run
+ *************************************************/
 
-const INITIAL=[
-  ['NUR',39,14,25,628,61,1,0],['EASIN',46,24,22,504,62,0,0],
-  ['RIFAT',44,29,15,752,1,0,0],['SABBIR',5,3,2,56,8,0,0],
-  ['TAWMID',35,21,14,400,45,1,0],['RAFUN',46,22,24,200,16,0,0],
-  ['JUBAYER',21,11,10,188,19,0,0],['MAHI',44,27,17,236,48,0,0]
-];
+const CONFIG = {
+  STATS_SHEET: 'Stats',
+  HISTORY_SHEET: 'History',
 
-function doPost(e){
-  const p=e&&e.parameter?e.parameter:{};
+  // তোমার Admin PIN এখানে রাখা হয়েছে।
+  // আগের PIN যদি 1234 না হয়, শুধু এই সংখ্যাটি বদলাবে।
+  ADMIN_PIN: '44990'
+};
+
+
+/* =========================
+   MAIN
+========================= */
+
+function doGet(e) {
+  e = e || {};
+  const p = e.parameter || {};
+
+  const action = String(p.action || 'get');
+  const callback = String(p.callback || '');
+
   let result;
-  try{setup_();const action=p.action||'';
-    if(action==='updatePhoto') result=updatePhoto_(p);
-    else if(action==='addPlayer') result=addPlayer_(p);
-    else throw new Error('Unknown action');
-  }catch(err){result={ok:false,error:String(err.message||err)}}
-  return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
-}
-function doGet(e){
-  const p=e&&e.parameter?e.parameter:{};
-  if(p.api==='1') return api_(p);
-  return HtmlService.createHtmlOutput('<h2>Cricket Stats Backend</h2><p>API is running.</p>');
-}
-function api_(p){
-  let result;
-  try{setup_();const action=p.action||'get';
-    if(action==='get') result={ok:true,players:readPlayers_()};
-    else if(action==='checkPin'){auth_(p);result={ok:true,message:'Admin verified'}}
-    else if(action==='save') result=save_(p);
-    else if(action==='addPlayer') result=addPlayer_(p);
-    else if(action==='updatePhoto') result=updatePhoto_(p);
-    else if(action==='deletePlayer') result=deletePlayer_(p);
-    else if(action==='resetPlayer') result=resetPlayer_(p);
-    else if(action==='deleteHistory') result=deleteHistory_(p);
-    else if(action==='correct') result=correct_(p);
-    else throw new Error('Unknown action');
-  }catch(err){result={ok:false,error:String(err.message||err)}}
-  const body=JSON.stringify(result),cb=p.callback;
-  if(cb&&/^[A-Za-z_$][\w$\.]*$/.test(cb)) return ContentService.createTextOutput(cb+'('+body+');').setMimeType(ContentService.MimeType.JAVASCRIPT);
-  return ContentService.createTextOutput(body).setMimeType(ContentService.MimeType.JSON);
-}
-function setup_(){
-  const ss=SpreadsheetApp.getActiveSpreadsheet();let sh=ss.getSheetByName(STATS_SHEET);
-  if(!sh){sh=ss.insertSheet(STATS_SHEET);sh.appendRow(['Player','Total Match','Won','Lost','Total Run','Total Wicket','50','100','Photo']);INITIAL.forEach(r=>sh.appendRow(r.concat([''])));}
-  else if(sh.getLastColumn()<9)sh.getRange(1,9).setValue('Photo');
-  let h=ss.getSheetByName(HISTORY_SHEET);if(!h){h=ss.insertSheet(HISTORY_SHEET);h.appendRow(['ID','Player','Match','Won','Lost','Run','Wicket','50','100','CreatedAt']);}
-}
-function readPlayers_(){
-  const sh=SpreadsheetApp.getActiveSpreadsheet().getSheetByName(STATS_SHEET),v=sh.getDataRange().getValues();
-  return v.slice(1).filter(r=>r[0]).map(r=>({name:String(r[0]),match:+r[1]||0,won:+r[2]||0,lost:+r[3]||0,run:+r[4]||0,wicket:+r[5]||0,fifty:+r[6]||0,hundred:+r[7]||0,photo:String(r[8]||'')}));
-}
-function auth_(p){if(String(p.pin||'')!==ADMIN_PIN)throw new Error('ভুল Admin PIN')}
-function save_(p){
-  auth_(p);const name=String(p.player||''),sh=SpreadsheetApp.getActiveSpreadsheet().getSheetByName(STATS_SHEET),vals=sh.getDataRange().getValues();
-  let row=-1;for(let i=1;i<vals.length;i++)if(String(vals[i][0])===name){row=i+1;break}if(row<0)throw new Error('Player not found');
-  const m=num_(p.match),w=num_(p.won),l=num_(p.lost),r=num_(p.run),wk=num_(p.wicket),f=num_(p.fifty),h=num_(p.hundred),cur=sh.getRange(row,2,1,7).getValues()[0];
-  sh.getRange(row,2,1,7).setValues([[cur[0]+m,cur[1]+w,cur[2]+l,cur[3]+r,cur[4]+wk,cur[5]+f,cur[6]+h]]);
-  SpreadsheetApp.getActiveSpreadsheet().getSheetByName(HISTORY_SHEET).appendRow([Utilities.getUuid(),name,m,w,l,r,wk,f,h,new Date()]);
-  return {ok:true,message:'সেভ হয়েছে',players:readPlayers_()};
-}
-function correct_(p){
-  auth_(p);
-  const name=String(p.player||'').trim();
-  if(!name)throw new Error('Player নির্বাচন করুন');
-  const sh=SpreadsheetApp.getActiveSpreadsheet().getSheetByName(STATS_SHEET);
-  const vals=sh.getDataRange().getValues();
-  let row=-1;
-  for(let i=1;i<vals.length;i++)if(String(vals[i][0])===name){row=i+1;break}
-  if(row<0)throw new Error('Player not found');
-  const sub=[num_(p.match),num_(p.won),num_(p.lost),num_(p.run),num_(p.wicket),num_(p.fifty),num_(p.hundred)];
-  if(sub.reduce((a,b)=>a+b,0)<=0)throw new Error('কমপক্ষে একটি সংখ্যা দিন');
-  const cur=sh.getRange(row,2,1,7).getValues()[0].map(Number);
-  for(let i=0;i<7;i++)if(sub[i]>cur[i])throw new Error('যত আছে তার চেয়ে বেশি কমানো যাবে না');
-  const next=cur.map((x,i)=>x-sub[i]);
-  sh.getRange(row,2,1,7).setValues([next]);
-  // Negative history entry keeps the correction reversible through History delete.
-  SpreadsheetApp.getActiveSpreadsheet().getSheetByName(HISTORY_SHEET).appendRow([Utilities.getUuid(),name,-sub[0],-sub[1],-sub[2],-sub[3],-sub[4],-sub[5],-sub[6],new Date()]);
-  return {ok:true,message:'ভুল Stats কমানো হয়েছে ✅',players:readPlayers_()};
-}
-function addPlayer_(p){
-  auth_(p);const name=String(p.name||'').trim();if(!name)throw new Error('Player name দিন');
-  const sh=SpreadsheetApp.getActiveSpreadsheet().getSheetByName(STATS_SHEET);
-  if(readPlayers_().some(x=>x.name.toLowerCase()===name.toLowerCase()))throw new Error('এই player আগে থেকেই আছে');
-  sh.appendRow([name,0,0,0,0,0,0,0,'']);return {ok:true,message:'Player যোগ হয়েছে',players:readPlayers_()};
-}
-function updatePhoto_(p){
-  auth_(p);const name=String(p.name||''),data=String(p.photo||'');if(!data)throw new Error('ছবি পাওয়া যায়নি');
-  const m=data.match(/^data:image\/(jpeg|jpg|png|webp);base64,(.+)$/i);if(!m)throw new Error('ছবির ফরম্যাট ঠিক নয়');
-  const bytes=Utilities.base64Decode(m[2]);if(bytes.length>8388608)throw new Error('ছবিটি 8MB-এর বেশি। 8MB-এর মধ্যে ছবি দিন');
-  const url=savePhotoToDrive_(data,name),sh=SpreadsheetApp.getActiveSpreadsheet().getSheetByName(STATS_SHEET),v=sh.getDataRange().getValues();
-  for(let i=1;i<v.length;i++)if(String(v[i][0])===name){
-    const oldUrl=String(v[i][8]||'');sh.getRange(i+1,9).setValue(url);
-    try{const mm=oldUrl.match(/(?:googleusercontent\.com\/d\/|drive\.google\.com\/(?:uc\?export=view\&id=|thumbnail\?id=))([^?&]+)/);if(mm&&mm[1])DriveApp.getFileById(mm[1]).setTrashed(true)}catch(e){}
-    return {ok:true,message:'Player-এর ছবি সেভ হয়েছে',players:readPlayers_()};
-  }throw new Error('Player পাওয়া যায়নি');
-}
-function savePhotoToDrive_(dataUrl,name){
-  const m=dataUrl.match(/^data:([^;]+);base64,(.+)$/);if(!m)throw new Error('ছবির ফরম্যাট ঠিক নয়');
-  const bytes=Utilities.base64Decode(m[2]);const mime=m[1].toLowerCase()==='image/jpg'?'image/jpeg':m[1];const ext=mime==='image/png'?'png':mime==='image/webp'?'webp':'jpg';const safe=String(name||'Player').replace(/[^A-Za-z0-9_-]/g,'_');
-  const file=DriveApp.createFile(Utilities.newBlob(bytes,mime,safe+'_'+Date.now()+'.'+ext));
-  file.setSharing(DriveApp.Access.ANYONE_WITH_LINK,DriveApp.Permission.VIEW);
-  return 'https://drive.google.com/thumbnail?id='+file.getId()+'&sz=w3000';
-}
-function repairExistingPhotoCells_(){
-  const sh=SpreadsheetApp.getActiveSpreadsheet().getSheetByName(STATS_SHEET);if(!sh)return;
-  const v=sh.getDataRange().getValues();
-  for(let i=1;i<v.length;i++){const name=String(v[i][0]||''),data=String(v[i][8]||'');if(!name||!data||data.indexOf('data:image/')!==0)continue;
-    try{const m=data.match(/^data:([^;]+);base64,(.+)$/);if(!m)continue;const bytes=Utilities.base64Decode(m[2]);if(bytes.length>8388608)continue;const url=savePhotoToDrive_(data,name);sh.getRange(i+1,9).setValue(url);}catch(e){}
+
+  try {
+    switch (action) {
+
+      case 'get':
+        result = getData();
+        break;
+
+      case 'checkPin':
+        result = checkPin(p.pin);
+        break;
+
+      case 'save':
+        result = saveMatch(p);
+        break;
+
+      case 'addPlayer':
+        result = addPlayer(p);
+        break;
+
+      case 'updatePhoto':
+        result = updatePhoto(p);
+        break;
+
+      case 'adjustStats':
+        result = adjustStats(p);
+        break;
+
+      case 'deletePlayer':
+        result = deletePlayer(p);
+        break;
+
+      case 'resetPlayer':
+        result = resetPlayer(p);
+        break;
+
+      case 'deleteHistory':
+        result = deleteHistory(p);
+        break;
+
+      default:
+        result = {
+          ok: false,
+          error: 'Unknown action'
+        };
+    }
+
+  } catch (err) {
+    result = {
+      ok: false,
+      error: String(err && err.message ? err.message : err)
+    };
   }
+
+  return sendResponse(result, callback);
 }
-function deletePlayer_(p){
-  auth_(p);const name=String(p.name||''),sh=SpreadsheetApp.getActiveSpreadsheet().getSheetByName(STATS_SHEET),v=sh.getDataRange().getValues();
-  for(let i=1;i<v.length;i++)if(String(v[i][0])===name){sh.deleteRow(i+1);return {ok:true,message:'Player মুছে দেওয়া হয়েছে',players:readPlayers_()}}throw new Error('Player পাওয়া যায়নি');
+
+
+/* =========================
+   RESPONSE
+========================= */
+
+function sendResponse(data, callback) {
+  const json = JSON.stringify(data);
+
+  if (callback) {
+    return ContentService
+      .createTextOutput(callback + '(' + json + ')')
+      .setMimeType(ContentService.MimeType.JAVASCRIPT);
+  }
+
+  return ContentService
+    .createTextOutput(json)
+    .setMimeType(ContentService.MimeType.JSON);
 }
-function resetPlayer_(p){
-  auth_(p);const name=String(p.name||''),sh=SpreadsheetApp.getActiveSpreadsheet().getSheetByName(STATS_SHEET),v=sh.getDataRange().getValues();
-  for(let i=1;i<v.length;i++)if(String(v[i][0])===name){sh.getRange(i+1,2,1,7).setValues([[0,0,0,0,0,0,0]]);return {ok:true,message:'Player stats reset হয়েছে',players:readPlayers_()}}throw new Error('Player পাওয়া যায়নি');
+
+
+/* =========================
+   SHEETS
+========================= */
+
+function getSpreadsheet() {
+  return SpreadsheetApp.getActiveSpreadsheet();
 }
-function deleteHistory_(p){
-  auth_(p);const id=String(p.id||''),hs=SpreadsheetApp.getActiveSpreadsheet().getSheetByName(HISTORY_SHEET),v=hs.getDataRange().getValues();
-  for(let i=1;i<v.length;i++)if(String(v[i][0])===id){const row=v[i],sh=SpreadsheetApp.getActiveSpreadsheet().getSheetByName(STATS_SHEET),sv=sh.getDataRange().getValues();
-    for(let j=1;j<sv.length;j++)if(String(sv[j][0])===String(row[1])){const nums=[1,2,3,4,5,6,7].map(k=>+row[k]||0),cur=sh.getRange(j+1,2,1,7).getValues()[0];sh.getRange(j+1,2,1,7).setValues([cur.map((x,k)=>x-nums[k])]);break}
-    hs.deleteRow(i+1);return {ok:true,message:'শেষ ম্যাচটি মুছে দেওয়া হয়েছে',players:readPlayers_()}
-  }throw new Error('History not found');
+
+
+function getStatsSheet() {
+  const ss = getSpreadsheet();
+  let sh = ss.getSheetByName(CONFIG.STATS_SHEET);
+
+  if (!sh) {
+    sh = ss.insertSheet(CONFIG.STATS_SHEET);
+  }
+
+  ensureStatsHeaders(sh);
+
+  return sh;
 }
-function num_(x){const n=Number(x);return isFinite(n)?n:0}
+
+
+function getHistorySheet() {
+  const ss = getSpreadsheet();
+  let sh = ss.getSheetByName(CONFIG.HISTORY_SHEET);
+
+  if (!sh) {
+    sh = ss.insertSheet(CONFIG.HISTORY_SHEET);
+  }
+
+  ensureHistoryHeaders(sh);
+
+  return sh;
+}
+
+
+/* =========================
+   HEADERS
+========================= */
+
+function ensureStatsHeaders(sh) {
+
+  const required = [
+    'Player',
+    'Total Match',
+    'Won',
+    'Lost',
+    'Total Run',
+    'Total Wicket',
+    '50',
+    '100',
+    'Photo',
+    'Hat-trick',
+    'Highest Run'
+  ];
+
+  const lastColumn = Math.max(sh.getLastColumn(), 1);
+  const firstRow = sh.getRange(1, 1, 1, lastColumn).getValues()[0];
+
+  let headers = firstRow.map(function(x) {
+    return String(x || '').trim();
+  });
+
+  if (headers.every(function(x) { return x === ''; })) {
+    sh.getRange(1, 1, 1, required.length).setValues([required]);
+    return;
+  }
+
+  // পুরোনো Header থাকলে নতুন কলাম যোগ করবে
+  required.forEach(function(header) {
+
+    if (headers.indexOf(header) === -1) {
+
+      const newColumn = headers.length + 1;
+
+      sh.getRange(1, newColumn).setValue(header);
+
+      headers.push(header);
+    }
+  });
+}
+
+
+function ensureHistoryHeaders(sh) {
+
+  const required = [
+    'ID',
+    'Player',
+    'Match',
+    'Won',
+    'Lost',
+    'Run',
+    'Wicket',
+    '50',
+    '100',
+    'Hat-trick',
+    'Highest Run',
+    'CreatedAt'
+  ];
+
+  const lastColumn = Math.max(sh.getLastColumn(), 1);
+  const firstRow = sh.getRange(1, 1, 1, lastColumn).getValues()[0];
+
+  let headers = firstRow.map(function(x) {
+    return String(x || '').trim();
+  });
+
+  if (headers.every(function(x) { return x === ''; })) {
+    sh.getRange(1, 1, 1, required.length).setValues([required]);
+    return;
+  }
+
+  required.forEach(function(header) {
+
+    if (headers.indexOf(header) === -1) {
+
+      const newColumn = headers.length + 1;
+
+      sh.getRange(1, newColumn).setValue(header);
+
+      headers.push(header);
+    }
+  });
+}
+
+
+/* =========================
+   HEADER MAP
+========================= */
+
+function getHeaderMap(sh) {
+
+  const lastColumn = sh.getLastColumn();
+
+  const headers = sh
+    .getRange(1, 1, 1, lastColumn)
+    .getValues()[0]
+    .map(function(x) {
+      return String(x || '').trim();
+    });
+
+  const map = {};
+
+  headers.forEach(function(header, index) {
+    if (header) {
+      map[header] = index + 1;
+    }
+  });
+
+  return map;
+}
+
+
+/* =========================
+   NUMBER HELPERS
+========================= */
+
+function num(value) {
+
+  if (value === undefined || value === null || value === '') {
+    return 0;
+  }
+
+  const n = Number(value);
+
+  if (isNaN(n)) {
+    return 0;
+  }
+
+  return n;
+}
+
+
+function nonNegative(value) {
+  return Math.max(0, num(value));
+}
+
+
+/* =========================
+   PIN
+========================= */
+
+function validPin(pin) {
+  return String(pin || '') === String(CONFIG.ADMIN_PIN);
+}
+
+
+function checkPin(pin) {
+
+  if (validPin(pin)) {
+    return {
+      ok: true,
+      message: 'PIN correct'
+    };
+  }
+
+  return {
+    ok: false,
+    error: 'ভুল PIN'
+  };
+}
+
+
+/* =========================
+   GET DATA
+========================= */
+
+function getData() {
+
+  const sh = getStatsSheet();
+
+  const lastRow = sh.getLastRow();
+  const lastColumn = sh.getLastColumn();
+
+  if (lastRow < 2) {
+    return {
+      ok: true,
+      players: []
+    };
+  }
+
+  const values = sh
+    .getRange(1, 1, lastRow, lastColumn)
+    .getValues();
+
+  const headers = values[0].map(function(x) {
+    return String(x || '').trim();
+  });
+
+  const players = [];
+
+  for (let r = 1; r < values.length; r++) {
+
+    const row = values[r];
+
+    if (!row.length) continue;
+
+    const obj = {};
+
+    headers.forEach(function(header, i) {
+
+      if (header) {
+        obj[header] = row[i];
+      }
+
+    });
+
+    if (!String(obj['Player'] || '').trim()) {
+      continue;
+    }
+
+    players.push({
+      player: String(obj['Player'] || ''),
+      name: String(obj['Player'] || ''),
+      match: nonNegative(obj['Total Match']),
+      won: nonNegative(obj['Won']),
+      lost: nonNegative(obj['Lost']),
+      run: nonNegative(obj['Total Run']),
+      wicket: nonNegative(obj['Total Wicket']),
+      fifty: nonNegative(obj['50']),
+      hundred: nonNegative(obj['100']),
+      photo: String(obj['Photo'] || ''),
+      hattrick: nonNegative(obj['Hat-trick']),
+      highestRun: nonNegative(obj['Highest Run'])
+    });
+  }
+
+  return {
+    ok: true,
+    players: players
+  };
+}
+
+
+/* =========================
+   FIND PLAYER
+========================= */
+
+function findPlayerRow(sh, player) {
+
+  const map = getHeaderMap(sh);
+  const playerColumn = map['Player'];
+
+  if (!playerColumn) {
+    return 0;
+  }
+
+  const lastRow = sh.getLastRow();
+
+  if (lastRow < 2) {
+    return 0;
+  }
+
+  const values = sh
+    .getRange(2, playerColumn, lastRow - 1, 1)
+    .getValues();
+
+  const target = String(player || '').trim().toLowerCase();
+
+  for (let i = 0; i < values.length; i++) {
+
+    const name = String(values[i][0] || '')
+      .trim()
+      .toLowerCase();
+
+    if (name === target) {
+      return i + 2;
+    }
+  }
+
+  return 0;
+}
+
+
+/* =========================
+   SAVE NEW MATCH
+========================= */
+
+function saveMatch(p) {
+
+  if (!validPin(p.pin)) {
+    return {
+      ok: false,
+      error: 'ভুল PIN'
+    };
+  }
+
+  const player = String(p.player || '').trim();
+
+  if (!player) {
+    return {
+      ok: false,
+      error: 'Player name missing'
+    };
+  }
+
+  const sh = getStatsSheet();
+  const map = getHeaderMap(sh);
+
+  const row = findPlayerRow(sh, player);
+
+  if (!row) {
+    return {
+      ok: false,
+      error: 'Player পাওয়া যায়নি'
+    };
+  }
+
+  const match = nonNegative(p.match);
+  const won = nonNegative(p.won);
+  const lost = nonNegative(p.lost);
+  const run = nonNegative(p.run);
+  const wicket = nonNegative(p.wicket);
+  const fifty = nonNegative(p.fifty);
+  const hundred = nonNegative(p.hundred);
+  const hattrick = nonNegative(p.hattrick);
+
+  // Highest Run = এই ম্যাচের রান
+  const enteredHighestRun = nonNegative(
+    p.highestRun !== undefined && p.highestRun !== ''
+      ? p.highestRun
+      : run
+  );
+
+  // পুরোনো data
+  const oldMatch = getCellNumber(sh, row, map['Total Match']);
+  const oldWon = getCellNumber(sh, row, map['Won']);
+  const oldLost = getCellNumber(sh, row, map['Lost']);
+  const oldRun = getCellNumber(sh, row, map['Total Run']);
+  const oldWicket = getCellNumber(sh, row, map['Total Wicket']);
+  const oldFifty = getCellNumber(sh, row, map['50']);
+  const oldHundred = getCellNumber(sh, row, map['100']);
+  const oldHattrick = getCellNumber(sh, row, map['Hat-trick']);
+  const oldHighestRun = getCellNumber(sh, row, map['Highest Run']);
+
+  // Update totals
+  setCellNumber(
+    sh,
+    row,
+    map['Total Match'],
+    oldMatch + match
+  );
+
+  setCellNumber(
+    sh,
+    row,
+    map['Won'],
+    oldWon + won
+  );
+
+  setCellNumber(
+    sh,
+    row,
+    map['Lost'],
+    oldLost + lost
+  );
+
+  setCellNumber(
+    sh,
+    row,
+    map['Total Run'],
+    oldRun + run
+  );
+
+  setCellNumber(
+    sh,
+    row,
+    map['Total Wicket'],
+    oldWicket + wicket
+  );
+
+  setCellNumber(
+    sh,
+    row,
+    map['50'],
+    oldFifty + fifty
+  );
+
+  setCellNumber(
+    sh,
+    row,
+    map['100'],
+    oldHundred + hundred
+  );
+
+  setCellNumber(
+    sh,
+    row,
+    map['Hat-trick'],
+    oldHattrick + hattrick
+  );
+
+  // Highest Run কখনো মোট রান নয়।
+  // শুধু এক ম্যাচের সর্বোচ্চ রান থাকবে।
+  if (enteredHighestRun > oldHighestRun) {
+
+    setCellNumber(
+      sh,
+      row,
+      map['Highest Run'],
+      enteredHighestRun
+    );
+  }
+
+  // History
+  const history = getHistorySheet();
+
+  const id =
+    new Date().getTime() +
+    '_' +
+    Math.floor(Math.random() * 100000);
+
+  const historyMap = getHeaderMap(history);
+
+  const historyRow = [];
+
+  const historyHeaders = history
+    .getRange(
+      1,
+      1,
+      1,
+      history.getLastColumn()
+    )
+    .getValues()[0];
+
+  historyHeaders.forEach(function(header) {
+
+    header = String(header || '').trim();
+
+    switch (header) {
+
+      case 'ID':
+        historyRow.push(id);
+        break;
+
+      case 'Player':
+        historyRow.push(player);
+        break;
+
+      case 'Match':
+        historyRow.push(match);
+        break;
+
+      case 'Won':
+        historyRow.push(won);
+        break;
+
+      case 'Lost':
+        historyRow.push(lost);
+        break;
+
+      case 'Run':
+        historyRow.push(run);
+        break;
+
+      case 'Wicket':
+        historyRow.push(wicket);
+        break;
+
+      case '50':
+        historyRow.push(fifty);
+        break;
+
+      case '100':
+        historyRow.push(hundred);
+        break;
+
+      case 'Hat-trick':
+        historyRow.push(hattrick);
+        break;
+
+      case 'Highest Run':
+        historyRow.push(enteredHighestRun);
+        break;
+
+      case 'CreatedAt':
+        historyRow.push(new Date());
+        break;
+
+      default:
+        historyRow.push('');
+    }
+  });
+
+  history.appendRow(historyRow);
+
+  SpreadsheetApp.flush();
+
+  return {
+    ok: true,
+    message: 'Stats saved successfully',
+    player: player
+  };
+}
+
+
+/* =========================
+   ADD PLAYER
+========================= */
+
+function addPlayer(p) {
+
+  if (!validPin(p.pin)) {
+    return {
+      ok: false,
+      error: 'ভুল PIN'
+    };
+  }
+
+  const player = String(p.player || '').trim();
+
+  if (!player) {
+    return {
+      ok: false,
+      error: 'Player name missing'
+    };
+  }
+
+  const sh = getStatsSheet();
+
+  const existing = findPlayerRow(sh, player);
+
+  if (existing) {
+    return {
+      ok: false,
+      error: 'এই Player আগে থেকেই আছে'
+    };
+  }
+
+  const map = getHeaderMap(sh);
+
+  const row = new Array(sh.getLastColumn()).fill('');
+
+  row[map['Player'] - 1] = player;
+  row[map['Total Match'] - 1] = 0;
+  row[map['Won'] - 1] = 0;
+  row[map['Lost'] - 1] = 0;
+  row[map['Total Run'] - 1] = 0;
+  row[map['Total Wicket'] - 1] = 0;
+  row[map['50'] - 1] = 0;
+  row[map['100'] - 1] = 0;
+  row[map['Photo'] - 1] = '';
+  row[map['Hat-trick'] - 1] = 0;
+  row[map['Highest Run'] - 1] = 0;
+
+  sh.appendRow(row);
+
+  SpreadsheetApp.flush();
+
+  return {
+    ok: true,
+    message: 'Player added'
+  };
+}
+
+
+/* =========================
+   UPDATE PHOTO
+========================= */
+
+function updatePhoto(p) {
+
+  if (!validPin(p.pin)) {
+    return {
+      ok: false,
+      error: 'ভুল PIN'
+    };
+  }
+
+  const player = String(p.player || '').trim();
+  const photo = String(p.photo || '');
+
+  if (!player) {
+    return {
+      ok: false,
+      error: 'Player name missing'
+    };
+  }
+
+  const sh = getStatsSheet();
+  const map = getHeaderMap(sh);
+  const row = findPlayerRow(sh, player);
+
+  if (!row) {
+    return {
+      ok: false,
+      error: 'Player পাওয়া যায়নি'
+    };
+  }
+
+  if (!map['Photo']) {
+    return {
+      ok: false,
+      error: 'Photo column পাওয়া যায়নি'
+    };
+  }
+
+  sh.getRange(row, map['Photo']).setValue(photo);
+
+  SpreadsheetApp.flush();
+
+  return {
+    ok: true,
+    message: 'Photo updated'
+  };
+}
+
+
+/* =========================
+   ADJUST STATS
+========================= */
+
+function adjustStats(p) {
+
+  if (!validPin(p.pin)) {
+    return {
+      ok: false,
+      error: 'ভুল PIN'
+    };
+  }
+
+  const player = String(p.player || '').trim();
+  const mode = String(p.mode || 'add').toLowerCase();
+
+  if (!player) {
+    return {
+      ok: false,
+      error: 'Player name missing'
+    };
+  }
+
+  if (mode !== 'add' && mode !== 'subtract') {
+    return {
+      ok: false,
+      error: 'Invalid mode'
+    };
+  }
+
+  const sh = getStatsSheet();
+  const map = getHeaderMap(sh);
+  const row = findPlayerRow(sh, player);
+
+  if (!row) {
+    return {
+      ok: false,
+      error: 'Player পাওয়া যায়নি'
+    };
+  }
+
+  const fields = [
+    {
+      key: 'match',
+      column: 'Total Match'
+    },
+    {
+      key: 'won',
+      column: 'Won'
+    },
+    {
+      key: 'lost',
+      column: 'Lost'
+    },
+    {
+      key: 'run',
+      column: 'Total Run'
+    },
+    {
+      key: 'wicket',
+      column: 'Total Wicket'
+    },
+    {
+      key: 'fifty',
+      column: '50'
+    },
+    {
+      key: 'hundred',
+      column: '100'
+    },
+    {
+      key: 'hattrick',
+      column: 'Hat-trick'
+    }
+  ];
+
+  fields.forEach(function(field) {
+
+    const amount = nonNegative(p[field.key]);
+
+    if (!amount) {
+      return;
+    }
+
+    const column = map[field.column];
+
+    if (!column) {
+      return;
+    }
+
+    const oldValue = getCellNumber(
+      sh,
+      row,
+      column
+    );
+
+    let newValue;
+
+    if (mode === 'add') {
+      newValue = oldValue + amount;
+    } else {
+      newValue = Math.max(
+        0,
+        oldValue - amount
+      );
+    }
+
+    setCellNumber(
+      sh,
+      row,
+      column,
+      newValue
+    );
+  });
+
+
+  /*
+   * Highest Run:
+   *
+   * এটা মোট রান নয়।
+   * Add করলে নতুন Highest Run value
+   * যদি বর্তমানের চেয়ে বেশি হয়, সেট হবে।
+   *
+   * Subtract করলে:
+   * বর্তমান Highest Run থেকে কমানো হবে।
+   * 0-এর নিচে যাবে না।
+   */
+
+  const highestRunAmount = nonNegative(p.highestRun);
+
+  if (
+    highestRunAmount &&
+    map['Highest Run']
+  ) {
+
+    const oldHighestRun = getCellNumber(
+      sh,
+      row,
+      map['Highest Run']
+    );
+
+    let newHighestRun;
+
+    if (mode === 'add') {
+
+      newHighestRun = Math.max(
+        oldHighestRun,
+        highestRunAmount
+      );
+
+    } else {
+
+      newHighestRun = Math.max(
+        0,
+        oldHighestRun - highestRunAmount
+      );
+    }
+
+    setCellNumber(
+      sh,
+      row,
+      map['Highest Run'],
+      newHighestRun
+    );
+  }
+
+  SpreadsheetApp.flush();
+
+  return {
+    ok: true,
+    message:
+      mode === 'add'
+        ? 'Stats increased'
+        : 'Stats decreased',
+    player: player
+  };
+}
+
+
+/* =========================
+   DELETE PLAYER
+========================= */
+
+function deletePlayer(p) {
+
+  if (!validPin(p.pin)) {
+    return {
+      ok: false,
+      error: 'ভুল PIN'
+    };
+  }
+
+  const player = String(p.player || '').trim();
+
+  const sh = getStatsSheet();
+  const row = findPlayerRow(sh, player);
+
+  if (!row) {
+    return {
+      ok: false,
+      error: 'Player পাওয়া যায়নি'
+    };
+  }
+
+  sh.deleteRow(row);
+
+  SpreadsheetApp.flush();
+
+  return {
+    ok: true,
+    message: 'Player deleted'
+  };
+}
+
+
+/* =========================
+   RESET PLAYER
+========================= */
+
+function resetPlayer(p) {
+
+  if (!validPin(p.pin)) {
+    return {
+      ok: false,
+      error: 'ভুল PIN'
+    };
+  }
+
+  const player = String(p.player || '').trim();
+
+  const sh = getStatsSheet();
+  const map = getHeaderMap(sh);
+  const row = findPlayerRow(sh, player);
+
+  if (!row) {
+    return {
+      ok: false,
+      error: 'Player পাওয়া যায়নি'
+    };
+  }
+
+  const resetColumns = [
+    'Total Match',
+    'Won',
+    'Lost',
+    'Total Run',
+    'Total Wicket',
+    '50',
+    '100',
+    'Hat-trick',
+    'Highest Run'
+  ];
+
+  resetColumns.forEach(function(column) {
+
+    if (map[column]) {
+      sh.getRange(row, map[column]).setValue(0);
+    }
+
+  });
+
+  SpreadsheetApp.flush();
+
+  return {
+    ok: true,
+    message: 'Player stats reset'
+  };
+}
+
+
+/* =========================
+   DELETE HISTORY
+========================= */
+
+function deleteHistory(p) {
+
+  if (!validPin(p.pin)) {
+    return {
+      ok: false,
+      error: 'ভুল PIN'
+    };
+  }
+
+  const history = getHistorySheet();
+
+  const lastRow = history.getLastRow();
+
+  if (lastRow < 2) {
+    return {
+      ok: false,
+      error: 'History empty'
+    };
+  }
+
+  const id = String(p.id || '').trim();
+
+  if (!id) {
+    return {
+      ok: false,
+      error: 'History ID missing'
+    };
+  }
+
+  const map = getHeaderMap(history);
+
+  if (!map['ID']) {
+    return {
+      ok: false,
+      error: 'ID column পাওয়া যায়নি'
+    };
+  }
+
+  const values = history
+    .getRange(
+      2,
+      map['ID'],
+      lastRow - 1,
+      1
+    )
+    .getValues();
+
+  let foundRow = 0;
+
+  for (let i = 0; i < values.length; i++) {
+
+    if (
+      String(values[i][0] || '').trim() === id
+    ) {
+      foundRow = i + 2;
+      break;
+    }
+  }
+
+  if (!foundRow) {
+    return {
+      ok: false,
+      error: 'History পাওয়া যায়নি'
+    };
+  }
+
+  history.deleteRow(foundRow);
+
+  SpreadsheetApp.flush();
+
+  return {
+    ok: true,
+    message: 'History deleted'
+  };
+}
+
+
+/* =========================
+   CELL HELPERS
+========================= */
+
+function getCellNumber(sh, row, column) {
+
+  if (!column) {
+    return 0;
+  }
+
+  return nonNegative(
+    sh.getRange(row, column).getValue()
+  );
+}
+
+
+function setCellNumber(sh, row, column, value) {
+
+  if (!column) {
+    return;
+  }
+
+  sh.getRange(row, column)
+    .setValue(nonNegative(value));
+}
