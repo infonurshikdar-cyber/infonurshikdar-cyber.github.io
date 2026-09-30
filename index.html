@@ -4,8 +4,8 @@
 <section id="home"><div class="card"><h2>Players</h2><div id="cards" class="players"><div class="muted">লোড হচ্ছে...</div></div></div></section>
 <section id="players" class="hide"><div class="card"><h2>📊 সব Stats</h2><div class="scroll"><table><thead><tr><th>Player</th><th>Match</th><th>Won</th><th>Lost</th><th>Win Rate</th><th>Run</th><th>Run Avg</th><th>Wicket</th><th>Wicket Avg</th><th>50</th><th>100</th><th>Hat-trick</th><th>Highest Run</th></tr></thead><tbody id="stats"></tbody></table></div></div></section>
 <section id="ranking" class="hide"><div class="card"><h2 class="sectionTitle">🏆 Ranking</h2><div id="rankAll" class="rankBox"><p class="muted">All-rounder: শুধু Batting Average + Wicket Average</p><div class="scroll"><table style="min-width:0"><thead><tr><th>Rank</th><th>Player</th><th>All-round Score</th><th>Batting Score</th><th>Bowling Score</th><th>Run Avg</th><th>Wicket Avg</th></tr></thead><tbody id="allRoundRank"></tbody></table></div></div><div id="rankBat" class="rankBox"><p class="muted">Batting Ranking: Run Average অনুযায়ী</p><div class="scroll"><table style="min-width:0"><thead><tr><th>Rank</th><th>Player</th><th>Score</th><th>Run Avg</th><th>Run</th><th>Match</th><th>50</th><th>100</th></tr></thead><tbody id="battingRank"></tbody></table></div></div><div id="rankBowl" class="rankBox"><p class="muted">Bowling Ranking: Wicket Average অনুযায়ী</p><div class="scroll"><table style="min-width:0"><thead><tr><th>Rank</th><th>Player</th><th>Score</th><th>Wicket Avg</th><th>Wicket</th><th>Match</th></tr></thead><tbody id="bowlingRank"></tbody></table></div></div><div id="rankWin" class="rankBox"><p class="muted">Win Ranking: Win Average অনুযায়ী</p><div class="scroll"><table style="min-width:0"><thead><tr><th>Rank</th><th>Player</th><th>Score</th><th>Win Avg</th><th>Win</th><th>Match</th><th>Lost</th></tr></thead><tbody id="winRank"></tbody></table></div></div></div></section><section id="admin" class="hide"><div id="login" class="card"><h2>🔐 Admin Login</h2><input id="pin" type="password" placeholder="Admin PIN"><br><br><button onclick="login()">Login</button><div id="loginMsg" class="actionMsg"></div></div><div id="panel" class="hide">
-<div class="card"><h2>➕ নতুন ম্যাচ যোগ</h2><div class="grid"><select id="player"></select><input id="match" type="number" min="0" value="1" placeholder="Match"><input id="won" type="number" min="0" value="0" placeholder="Won"><input id="lost" type="number" min="0" value="0" placeholder="Lost"><input id="run" type="number" min="0" value="0" placeholder="Run"><input id="wicket" type="number" min="0" value="0" placeholder="Wicket"><input id="fifty" type="number" min="0" value="0" placeholder="50"><input id="hundred" type="number" min="0" value="0" placeholder="100"></div><br><button onclick="saveMatch()">Save Match</button><div id="saveMsg" class="actionMsg"></div></div>
-<div class="card"><h2>✏️ ভুল ডেটা ঠিক করুন</h2><p class="muted">কোনো Player-এর Stats ভুল হলে এখানে বেছে নিয়ে বাড়াতে বা কমাতে পারবেন।</p><div class="grid"><select id="adjustPlayer"></select><select id="adjustMode"><option value="add">বাড়াতে</option><option value="subtract">কমাতে</option></select><input id="adjustMatch" type="number" min="0" value="0" placeholder="Match"><input id="adjustWon" type="number" min="0" value="0" placeholder="Win"><input id="adjustLost" type="number" min="0" value="0" placeholder="Lost"><input id="adjustRun" type="number" min="0" value="0" placeholder="Run"><input id="adjustWicket" type="number" min="0" value="0" placeholder="Wicket"><input id="adjustFifty" type="number" min="0" value="0" placeholder="50"><input id="adjustHundred" type="number" min="0" value="0" placeholder="100"></div><br><button onclick="adjustStats()">Stats পরিবর্তন করুন</button><div id="adjustMsg" class="actionMsg"></div></div>
+<div class="card"><h2>➕ নতুন ম্যাচ যোগ</h2><div class="grid"><select id="player"></select><input id="match" type="number" min="0" value="1" placeholder="Match"><input id="won" type="number" min="0" value="0" placeholder="Won"><input id="lost" type="number" min="0" value="0" placeholder="Lost"><input id="run" type="number" min="0" value="0" placeholder="Run"><input id="wicket" type="number" min="0" value="0" placeholder="Wicket"><input id="fifty" type="number" min="0" value="0" placeholder="50"><input id="hundred" type="number" min="0" value="0" placeholder="100"><input id="hattrick" type="number" min="0" value="0" placeholder="Hat-trick"><input id="highestRun" type="number" min="0" value="0" placeholder="Highest Run"></div><br><button onclick="saveMatch()">Save Match</button><div id="saveMsg" class="actionMsg"></div></div>
+<div class="card"><h2>✏️ ভুল ডেটা ঠিক করুন</h2><p class="muted">কোনো Player-এর Stats ভুল হলে এখানে বেছে নিয়ে বাড়াতে বা কমাতে পারবেন।</p><div class="grid"><select id="adjustPlayer"></select><select id="adjustMode"><option value="add">বাড়াতে</option><option value="subtract">কমাতে</option></select><input id="adjustMatch" type="number" min="0" value="0" placeholder="Match"><input id="adjustWon" type="number" min="0" value="0" placeholder="Win"><input id="adjustLost" type="number" min="0" value="0" placeholder="Lost"><input id="adjustRun" type="number" min="0" value="0" placeholder="Run"><input id="adjustWicket" type="number" min="0" value="0" placeholder="Wicket"><input id="adjustFifty" type="number" min="0" value="0" placeholder="50"><input id="adjustHundred" type="number" min="0" value="0" placeholder="100"><input id="adjustHattrick" type="number" min="0" value="0" placeholder="Hat-trick"><input id="adjustHighestRun" type="number" min="0" value="0" placeholder="Highest Run"></div><br><button onclick="adjustStats()">Stats পরিবর্তন করুন</button><div id="adjustMsg" class="actionMsg"></div></div>
 <div class="card"><h2>👤 Player যোগ / মুছুন</h2><input id="newPlayer" placeholder="নতুন Player নাম"><br><br><button onclick="addPlayer()">Player যোগ করুন</button><br><br><button class="danger" onclick="deletePlayer()">Selected Player মুছে দিন</button><br><br><button class="danger" onclick="resetPlayer()">Selected Player-এর সব Stats Reset</button><div id="manageMsg" class="actionMsg"></div></div>
 </div></section></div><script>
 const API='https://script.google.com/macros/s/AKfycbxCSeH5OjhjT5AoLZQEmtdE-gYf1hqetebhgZWrdBzFWGrD5sRVm_8h66N7x_mzLXTn/exec';let DATA={players:[]},PIN='';
@@ -102,6 +102,7 @@ function renderRanking(){
 function login(){const p=document.getElementById('pin').value.trim();if(!p){document.getElementById('loginMsg').textContent='Admin PIN দিন';return}api({action:'checkPin',pin:p},x=>{if(x.ok){PIN=p;document.getElementById('login').classList.add('hide');document.getElementById('panel').classList.remove('hide');document.getElementById('loginMsg').textContent=''}else document.getElementById('loginMsg').textContent=x.error||'ভুল Admin PIN'})}
 function n(id){const v=Number(document.getElementById(id).value);return Number.isFinite(v)&&v>=0?v:0}
 let pendingSave=null;
+let pendingAdjust=null;
 let saveBusy=false;
 let activeSaveRequestId=null;
 
@@ -112,7 +113,7 @@ function saveMatch(){
  if(!activeSaveRequestId){activeSaveRequestId='SAVE-'+Date.now()+'-'+Math.random().toString(36).slice(2,10);}
  pendingSave={
    requestId:activeSaveRequestId, pin:PIN, player:player, match:n('match'), won:n('won'), lost:n('lost'),
-   run:n('run'), wicket:n('wicket'), fifty:n('fifty'), hundred:n('hundred')
+   run:n('run'), wicket:n('wicket'), fifty:n('fifty'), hundred:n('hundred'), hattrick:n('hattrick'), highestRun:n('highestRun')
  };
  document.getElementById('previewContent').innerHTML=
    '<b>Player:</b> '+esc(player)+'<br>'+
@@ -122,7 +123,9 @@ function saveMatch(){
    '<b>Run:</b> '+pendingSave.run+'<br>'+
    '<b>Wicket:</b> '+pendingSave.wicket+'<br>'+
    '<b>50:</b> '+pendingSave.fifty+'<br>'+
-   '<b>100:</b> '+pendingSave.hundred;
+   '<b>100:</b> '+pendingSave.hundred+'<br>'+
+   '<b>Hat-trick:</b> '+pendingSave.hattrick+'<br>'+
+   '<b>Highest Run:</b> '+pendingSave.highestRun;
  document.getElementById('previewMsg').textContent='';
  document.getElementById('confirmSaveBtn').disabled=false;
  document.getElementById('savePreview').classList.remove('hide');
@@ -131,8 +134,11 @@ function saveMatch(){
 function cancelSavePreview(){
  if(saveBusy)return;
  pendingSave=null;
+ pendingAdjust=null;
  activeSaveRequestId=null;
  document.getElementById('savePreview').classList.add('hide');
+ document.getElementById('confirmSaveBtn').onclick=confirmSave;
+ document.getElementById('confirmSaveBtn').textContent='OK — সেভ করুন';
 }
 
 function confirmSave(){
@@ -154,9 +160,12 @@ function confirmSave(){
        if(idx>=0) DATA.players[idx]=x.playerData;
        render();
      }else if(x.players){DATA=x;render();}
-     ['match','won','lost','run','wicket','fifty','hundred'].forEach(id=>document.getElementById(id).value=id==='match'?1:0);
+     ['match','won','lost','run','wicket','fifty','hundred','hattrick','highestRun'].forEach(id=>document.getElementById(id).value=id==='match'?1:0);
      pendingSave=null;
+     pendingAdjust=null;
      activeSaveRequestId=null;
+     btn.onclick=confirmSave;
+     btn.textContent='OK — সেভ করুন';
      setTimeout(()=>document.getElementById('savePreview').classList.add('hide'),350);
    }else{
      document.getElementById('previewMsg').textContent=x.error||'সেভ করা যায়নি';
@@ -167,7 +176,65 @@ function confirmSave(){
  });
 }
 
-function adjustStats(){const name=document.getElementById('adjustPlayer').value;const mode=document.getElementById('adjustMode').value;const values={match:n('adjustMatch'),won:n('adjustWon'),lost:n('adjustLost'),run:n('adjustRun'),wicket:n('adjustWicket'),fifty:n('adjustFifty'),hundred:n('adjustHundred')};if(Object.values(values).every(v=>v===0)){document.getElementById('adjustMsg').textContent='কমপক্ষে একটি সংখ্যা দিন';return}if(!confirm(name+' এর Stats '+(mode==='add'?'বাড়াবেন':'কমাবেন')+'?'))return;api({action:'adjustStats',pin:PIN,player:name,mode:mode,match:values.match,won:values.won,lost:values.lost,run:values.run,wicket:values.wicket,fifty:values.fifty,hundred:values.hundred},x=>{document.getElementById('adjustMsg').textContent=x.ok?(x.message||'সংশোধন হয়েছে ✅'):x.error||'সমস্যা হয়েছে';if(x.ok){DATA=x;render();['adjustMatch','adjustWon','adjustLost','adjustRun','adjustWicket','adjustFifty','adjustHundred'].forEach(id=>document.getElementById(id).value=0)}})}
+function adjustStats(){
+ if(saveBusy)return;
+ const name=document.getElementById('adjustPlayer').value;
+ const mode=document.getElementById('adjustMode').value;
+ const values={match:n('adjustMatch'),won:n('adjustWon'),lost:n('adjustLost'),run:n('adjustRun'),wicket:n('adjustWicket'),fifty:n('adjustFifty'),hundred:n('adjustHundred'),hattrick:n('adjustHattrick'),highestRun:n('adjustHighestRun')};
+ if(Object.values(values).every(v=>v===0)){document.getElementById('adjustMsg').textContent='কমপক্ষে একটি সংখ্যা দিন';return}
+ pendingAdjust={pin:PIN,player:name,mode:mode,...values};
+ const sign=mode==='add'?'+':'-';
+ document.getElementById('previewContent').innerHTML=
+   '<b>Player:</b> '+esc(name)+'<br>'+
+   '<b>পরিবর্তন:</b> '+(mode==='add'?'বাড়ানো':'কমানো')+'<br>'+
+   '<b>Match:</b> '+sign+values.match+'<br>'+
+   '<b>Win:</b> '+sign+values.won+'<br>'+
+   '<b>Lost:</b> '+sign+values.lost+'<br>'+
+   '<b>Run:</b> '+sign+values.run+'<br>'+
+   '<b>Wicket:</b> '+sign+values.wicket+'<br>'+
+   '<b>50:</b> '+sign+values.fifty+'<br>'+   '<b>100:</b> '+sign+values.hundred+'<br>'+   '<b>Hat-trick:</b> '+sign+values.hattrick+'<br>'+   '<b>Highest Run:</b> '+sign+values.highestRun;
+ document.getElementById('previewMsg').textContent='';
+ const btn=document.getElementById('confirmSaveBtn');
+ btn.disabled=false;
+ btn.textContent='OK — পরিবর্তন সেভ করুন';
+ btn.onclick=confirmAdjust;
+ document.getElementById('savePreview').classList.remove('hide');
+}
+
+function confirmAdjust(){
+ if(saveBusy || !pendingAdjust)return;
+ saveBusy=true;
+ const btn=document.getElementById('confirmSaveBtn');
+ btn.disabled=true;
+ btn.textContent='সেভ হচ্ছে... ⏳';
+ document.getElementById('previewMsg').textContent='সেভ হচ্ছে... ⏳';
+ document.getElementById('adjustMsg').textContent='সেভ হচ্ছে... ⏳';
+ const a=pendingAdjust;
+ api({action:'adjustStats',pin:a.pin,player:a.player,mode:a.mode,match:a.match,won:a.won,lost:a.lost,run:a.run,wicket:a.wicket,fifty:a.fifty,hundred:a.hundred,hattrick:a.hattrick,highestRun:a.highestRun},x=>{
+   saveBusy=false;
+   if(x.ok){
+     const signText=a.mode==='add'?'বাড়ানো হয়েছে ✅':'কমানো হয়েছে ✅';
+     document.getElementById('previewMsg').textContent=signText;
+     document.getElementById('adjustMsg').textContent=signText;
+     const p=(DATA.players||[]).find(q=>(q.name||q.player||'')===a.player);
+     if(p){
+       const fields=['match','won','lost','run','wicket','fifty','hundred','hattrick'];
+       fields.forEach(k=>{const old=Number(p[k]||0), amount=Number(a[k]||0);p[k]=a.mode==='add'?old+amount:Math.max(0,old-amount)});
+       const oldHR=Number(p.highestRun||0), amountHR=Number(a.highestRun||0);
+       p.highestRun=a.mode==='add'?Math.max(oldHR,amountHR):Math.max(0,oldHR-amountHR);
+       render();
+     }
+     ['adjustMatch','adjustWon','adjustLost','adjustRun','adjustWicket','adjustFifty','adjustHundred','adjustHattrick','adjustHighestRun'].forEach(id=>document.getElementById(id).value=0);
+     pendingAdjust=null;
+     setTimeout(()=>{document.getElementById('savePreview').classList.add('hide');btn.onclick=confirmSave;btn.textContent='OK — সেভ করুন';},350);
+   }else{
+     document.getElementById('previewMsg').textContent=x.error||'সেভ করা যায়নি ❌';
+     document.getElementById('adjustMsg').textContent=x.error||'সেভ করা যায়নি ❌';
+     btn.disabled=false;
+     btn.textContent='OK — পরিবর্তন সেভ করুন';
+   }
+ });
+}
 function addPlayer(){const name=document.getElementById('newPlayer').value.trim();if(!name){document.getElementById('manageMsg').textContent='Player name দিন';return}api({action:'addPlayer',pin:PIN,player:name},done('manageMsg'))}
 function deletePlayer(){const name=document.getElementById('player').value;if(!name)return;if(!confirm('এই Player সম্পূর্ণ মুছে ফেলবেন?'))return;api({action:'deletePlayer',pin:PIN,player:name},done('manageMsg'))}
 function resetPlayer(){const name=document.getElementById('player').value;if(!name)return;if(!confirm('এই Player-এর সব Stats 0 করে দেবেন?'))return;api({action:'resetPlayer',pin:PIN,player:name},done('manageMsg'))}
