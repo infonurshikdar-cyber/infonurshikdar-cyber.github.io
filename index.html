@@ -12,26 +12,16 @@ const API='https://script.google.com/macros/s/AKfycbxCSeH5OjhjT5AoLZQEmtdE-gYf1h
 function show(id){['home','players','ranking','admin'].forEach(x=>document.getElementById(x).classList.toggle('hide',x!==id));['homeBtn','playersBtn','rankingBtn','adminBtn'].forEach(x=>document.getElementById(x).classList.remove('active'));document.getElementById(id+'Btn').classList.add('active');if(id==='ranking')renderRanking()}
 let API_BUSY=false;
 function api(params,cb){
- if(API_BUSY){cb({ok:false,error:'একটি কাজ এখনো চলছে। একটু অপেক্ষা করুন।'});return}
- API_BUSY=true;
  const s=document.createElement('script');
  const c='cb'+Date.now()+Math.floor(Math.random()*10000);
  params.api='1';params.callback=c;
- let finished=false,tries=0;
- const finish=(x)=>{if(finished)return;finished=true;API_BUSY=false;delete window[c];try{s.remove()}catch(e){}cb(x)};
+ let finished=false;
+ const finish=(x)=>{if(finished)return;finished=true;clearTimeout(timer);delete window[c];try{s.remove()}catch(e){};API_BUSY=false;cb(x)};
  window[c]=(x)=>finish(x);
- s.onerror=()=>{
-   if(tries<1){tries++;setTimeout(()=>{
-     if(finished)return;
-     try{s.remove()}catch(e){}
-     const s2=document.createElement('script');
-     s2.src=API+'?'+new URLSearchParams(params).toString();
-     s2.onerror=()=>finish({ok:false,error:'Backend connection failed'});
-     document.body.appendChild(s2);
-   },700)}else finish({ok:false,error:'Backend connection failed'});
- };
+ s.onerror=()=>finish({ok:false,error:'Backend connection failed'});
  s.src=API+'?'+new URLSearchParams(params).toString();
  document.body.appendChild(s);
+ const timer=setTimeout(()=>finish({ok:false,error:'সেভ হতে বেশি সময় লাগছে। Apps Script deployment/version পরীক্ষা করুন।'}),15000);
 }
 function load(){const go=()=>api({action:'get'},x=>{if(!x.ok){document.getElementById('cards').innerHTML='<div>Backend সংযোগ হচ্ছে না। Apps Script deployment ঠিক আছে কি না দেখুন।</div>';return}DATA=x;render()});if(API_BUSY){setTimeout(go,150);return}go()}
 
@@ -103,7 +93,7 @@ function confirmSave(){
    if(x.ok){
      document.getElementById('previewMsg').textContent='সেভ হয়েছে ✅';
      document.getElementById('saveMsg').textContent='সেভ হয়েছে ✅';
-     load();
+     if(x.players){DATA=x;render()}else{load()}
      ['match','won','lost','run','wicket','fifty','hundred','hattrick','highestRun'].forEach(id=>document.getElementById(id).value=id==='match'?1:0);
      pendingSave=null;
      setTimeout(()=>document.getElementById('savePreview').classList.add('hide'),700);
@@ -116,11 +106,11 @@ function confirmSave(){
  });
 }
 
-function adjustStats(){const name=document.getElementById('adjustPlayer').value;const mode=document.getElementById('adjustMode').value;const values={match:n('adjustMatch'),won:n('adjustWon'),lost:n('adjustLost'),run:n('adjustRun'),wicket:n('adjustWicket'),fifty:n('adjustFifty'),hundred:n('adjustHundred'),hattrick:n('adjustHattrick'),highestRun:n('adjustHighestRun')};if(Object.values(values).every(v=>v===0)){document.getElementById('adjustMsg').textContent='কমপক্ষে একটি সংখ্যা দিন';return}if(!confirm(name+' এর Stats '+(mode==='add'?'বাড়াবেন':'কমাবেন')+'?'))return;api({action:'adjustStats',pin:PIN,player:name,mode:mode,match:values.match,won:values.won,lost:values.lost,run:values.run,wicket:values.wicket,fifty:values.fifty,hundred:values.hundred,hattrick:values.hattrick,highestRun:values.highestRun},x=>{document.getElementById('adjustMsg').textContent=x.ok?(x.message||'সংশোধন হয়েছে ✅'):x.error||'সমস্যা হয়েছে';if(x.ok){load();['adjustMatch','adjustWon','adjustLost','adjustRun','adjustWicket','adjustFifty','adjustHundred','adjustHattrick','adjustHighestRun'].forEach(id=>document.getElementById(id).value=0)}})}
+function adjustStats(){const name=document.getElementById('adjustPlayer').value;const mode=document.getElementById('adjustMode').value;const values={match:n('adjustMatch'),won:n('adjustWon'),lost:n('adjustLost'),run:n('adjustRun'),wicket:n('adjustWicket'),fifty:n('adjustFifty'),hundred:n('adjustHundred'),hattrick:n('adjustHattrick'),highestRun:n('adjustHighestRun')};if(Object.values(values).every(v=>v===0)){document.getElementById('adjustMsg').textContent='কমপক্ষে একটি সংখ্যা দিন';return}if(!confirm(name+' এর Stats '+(mode==='add'?'বাড়াবেন':'কমাবেন')+'?'))return;api({action:'adjustStats',pin:PIN,player:name,mode:mode,match:values.match,won:values.won,lost:values.lost,run:values.run,wicket:values.wicket,fifty:values.fifty,hundred:values.hundred,hattrick:values.hattrick,highestRun:values.highestRun},x=>{document.getElementById('adjustMsg').textContent=x.ok?(x.message||'সংশোধন হয়েছে ✅'):x.error||'সমস্যা হয়েছে';if(x.ok){if(x.players){DATA=x;render()}else{load()}['adjustMatch','adjustWon','adjustLost','adjustRun','adjustWicket','adjustFifty','adjustHundred','adjustHattrick','adjustHighestRun'].forEach(id=>document.getElementById(id).value=0)}})}
 function addPlayer(){const name=document.getElementById('newPlayer').value.trim();if(!name){document.getElementById('manageMsg').textContent='Player name দিন';return}api({action:'addPlayer',pin:PIN,player:name},done('manageMsg'))}
 function deletePlayer(){const name=document.getElementById('player').value;if(!name)return;if(!confirm('এই Player সম্পূর্ণ মুছে ফেলবেন?'))return;api({action:'deletePlayer',pin:PIN,player:name},done('manageMsg'))}
 function resetPlayer(){const name=document.getElementById('player').value;if(!name)return;if(!confirm('এই Player-এর সব Stats 0 করে দেবেন?'))return;api({action:'resetPlayer',pin:PIN,player:name},done('manageMsg'))}
-function done(id){return x=>{document.getElementById(id).textContent=x.ok?(x.message||'হয়ে গেছে ✅'):x.error;if(x.ok){load()}}}
+function done(id){return x=>{document.getElementById(id).textContent=x.ok?(x.message||'হয়ে গেছে ✅'):x.error;if(x.ok){if(x.players){DATA=x;render()}else{load()}}}}
 function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 load();
 </script>
