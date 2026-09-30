@@ -17,10 +17,19 @@ function api(params,cb){
  const s=document.createElement('script');
  const c='cb'+Date.now()+Math.floor(Math.random()*10000);
  params.api='1';params.callback=c;
- let finished=false;
+ let finished=false,tries=0;
  const finish=(x)=>{if(finished)return;finished=true;API_BUSY=false;delete window[c];try{s.remove()}catch(e){}cb(x)};
  window[c]=(x)=>finish(x);
- s.onerror=()=>finish({ok:false,error:'সেভ/ডেটা নেওয়া যায়নি ❌'});
+ s.onerror=()=>{
+   if(tries<1){tries++;setTimeout(()=>{
+     if(finished)return;
+     try{s.remove()}catch(e){}
+     const s2=document.createElement('script');
+     s2.src=API+'?'+new URLSearchParams(params).toString();
+     s2.onerror=()=>finish({ok:false,error:'Backend connection failed'});
+     document.body.appendChild(s2);
+   },700)}else finish({ok:false,error:'Backend connection failed'});
+ };
  s.src=API+'?'+new URLSearchParams(params).toString();
  document.body.appendChild(s);
 }
@@ -147,17 +156,13 @@ function confirmSave(){
  api(pendingSave,x=>{
    saveBusy=false;
    if(x.ok){
-     document.getElementById('previewMsg').textContent=x.duplicate?'আগেই সেভ হয়েছিল — আবার যোগ হয়নি ✅':'সেভ হয়েছে ✅';
-     document.getElementById('saveMsg').textContent=x.duplicate?'আগেই সেভ হয়েছিল — আবার যোগ হয়নি ✅':'সেভ হয়েছে ✅';
-     if(x.playerData){
-       const idx=(DATA.players||[]).findIndex(p=>(p.name||p.player||'')===x.playerData.name);
-       if(idx>=0) DATA.players[idx]=x.playerData;
-       render();
-     }else if(x.players){DATA=x;render();}
+     document.getElementById('previewMsg').textContent='সেভ হয়েছে ✅';
+     document.getElementById('saveMsg').textContent='সেভ হয়েছে ✅';
+     if(x.players){DATA=x;render();}else{load();}
      ['match','won','lost','run','wicket','fifty','hundred'].forEach(id=>document.getElementById(id).value=id==='match'?1:0);
      pendingSave=null;
      activeSaveRequestId=null;
-     setTimeout(()=>document.getElementById('savePreview').classList.add('hide'),350);
+     setTimeout(()=>document.getElementById('savePreview').classList.add('hide'),700);
    }else{
      document.getElementById('previewMsg').textContent=x.error||'সেভ করা যায়নি';
      document.getElementById('saveMsg').textContent=x.error||'সেভ করা যায়নি';
