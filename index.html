@@ -12,7 +12,21 @@ const API='https://script.google.com/macros/s/AKfycbxCSeH5OjhjT5AoLZQEmtdE-gYf1h
 function show(id){['home','players','ranking','admin'].forEach(x=>document.getElementById(x).classList.toggle('hide',x!==id));['homeBtn','playersBtn','rankingBtn','adminBtn'].forEach(x=>document.getElementById(x).classList.remove('active'));document.getElementById(id+'Btn').classList.add('active');if(id==='ranking')renderRanking()}
 let API_BUSY=false;
 function api(params,cb){
- if(API_BUSY){cb({ok:false,error:'একটি কাজ এখনো চলছে। একটু অপেক্ষা করুন।'});return}
+ const action=String(params.action||'get');
+ if(API_BUSY){
+   if(action==='save' || action==='adjustStats'){
+     let waited=0;
+     const wait=()=>{
+       if(!API_BUSY){ api(params,cb); return; }
+       if(waited>=6000){ cb({ok:false,error:'আগের কাজটি শেষ হতে বেশি সময় লাগছে। আবার চেষ্টা করুন ❌'}); return; }
+       waited+=150; setTimeout(wait,150);
+     };
+     wait();
+     return;
+   }
+   cb({ok:false,error:'একটি কাজ এখনো চলছে। একটু অপেক্ষা করুন।'});
+   return;
+ }
  API_BUSY=true;
  const s=document.createElement('script');
  const c='cb'+Date.now()+Math.floor(Math.random()*10000);
@@ -146,7 +160,7 @@ function adjustStats(){
  const mode=document.getElementById('adjustMode').value;
  const values={match:n('adjustMatch'),won:n('adjustWon'),lost:n('adjustLost'),run:n('adjustRun'),wicket:n('adjustWicket'),fifty:n('adjustFifty'),hundred:n('adjustHundred'),hattrick:n('adjustHattrick'),highestRun:n('adjustHighestRun')};
  if(Object.values(values).every(v=>v===0)){document.getElementById('adjustMsg').textContent='কমপক্ষে একটি সংখ্যা দিন';return}
- pendingAdjust={pin:PIN,player:name,mode:mode,...values};
+ pendingAdjust={requestId:'ADJUST-'+Date.now()+'-'+Math.random().toString(36).slice(2,10),pin:PIN,player:name,mode:mode,...values};
  const sign=mode==='add'?'+':'-';
  document.getElementById('previewContent').innerHTML=
    '<b>Player:</b> '+esc(name)+'<br>'+
@@ -174,7 +188,7 @@ function confirmAdjust(){
  document.getElementById('previewMsg').textContent='সেভ হচ্ছে... ⏳';
  document.getElementById('adjustMsg').textContent='সেভ হচ্ছে... ⏳';
  const a=pendingAdjust;
- api({action:'adjustStats',pin:a.pin,player:a.player,mode:a.mode,match:a.match,won:a.won,lost:a.lost,run:a.run,wicket:a.wicket,fifty:a.fifty,hundred:a.hundred,hattrick:a.hattrick,highestRun:a.highestRun},x=>{
+ api({action:'adjustStats',requestId:a.requestId,pin:a.pin,player:a.player,mode:a.mode,match:a.match,won:a.won,lost:a.lost,run:a.run,wicket:a.wicket,fifty:a.fifty,hundred:a.hundred,hattrick:a.hattrick,highestRun:a.highestRun},x=>{
    saveBusy=false;
    if(x.ok){
      const signText=a.mode==='add'?'বাড়ানো হয়েছে ✅':'কমানো হয়েছে ✅';
