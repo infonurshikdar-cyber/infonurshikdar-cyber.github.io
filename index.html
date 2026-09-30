@@ -90,7 +90,7 @@ function saveMatch(){
  if(!player){document.getElementById('saveMsg').textContent='Player নির্বাচন করুন';return}
  if(!activeSaveRequestId){activeSaveRequestId='SAVE-'+Date.now()+'-'+Math.random().toString(36).slice(2,10);}
  pendingSave={
-   requestId:activeSaveRequestId, pin:PIN, player:player, match:n('match'), won:n('won'), lost:n('lost'),
+   action:'save', requestId:activeSaveRequestId, pin:PIN, player:player, match:n('match'), won:n('won'), lost:n('lost'),
    run:n('run'), wicket:n('wicket'), fifty:n('fifty'), hundred:n('hundred'), hattrick:n('hattrick'), highestRun:n('highestRun')
  };
  document.getElementById('previewContent').innerHTML=
@@ -134,8 +134,10 @@ function confirmSave(){
      document.getElementById('previewMsg').textContent=x.duplicate?'আগেই সেভ হয়েছিল — আবার যোগ হয়নি ✅':'সেভ হয়েছে ✅';
      document.getElementById('saveMsg').textContent=x.duplicate?'আগেই সেভ হয়েছিল — আবার যোগ হয়নি ✅':'সেভ হয়েছে ✅';
      if(x.playerData){
-       const idx=(DATA.players||[]).findIndex(p=>(p.name||p.player||'')===x.playerData.name);
+       const nm=String(x.playerData.name||x.playerData.player||'');
+       const idx=(DATA.players||[]).findIndex(p=>String(p.name||p.player||'')===nm);
        if(idx>=0) DATA.players[idx]=x.playerData;
+       else DATA.players=[...(DATA.players||[]),x.playerData];
        render();
      }else if(x.players){DATA=x;render();}
      ['match','won','lost','run','wicket','fifty','hundred','hattrick','highestRun'].forEach(id=>document.getElementById(id).value=id==='match'?1:0);
