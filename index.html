@@ -155,12 +155,13 @@ function confirmSave(){
  api(payload,x=>{
    saveBusy=false;
    if(x && x.ok){
-     if(x.players) { DATA=x; render(); } else { load(); }
+     // Show success and close the preview immediately; refresh the data afterward.
      document.getElementById('previewMsg').textContent='সেভ হয়েছে ✅';
      document.getElementById('saveMsg').textContent='সেভ হয়েছে ✅';
+     document.getElementById('savePreview').classList.add('hide');
      ['match','won','lost','run','wicket','fifty','hundred','hattrick','highestRun'].forEach(id=>document.getElementById(id).value=id==='match'?1:0);
      pendingSave=null;
-     setTimeout(()=>document.getElementById('savePreview').classList.add('hide'),700);
+     if(x.players) { DATA=x; render(); } else { load(); }
    }else{
      const msg=(x&&x.error)||'সেভ করা যায়নি';
      document.getElementById('previewMsg').textContent=msg;
