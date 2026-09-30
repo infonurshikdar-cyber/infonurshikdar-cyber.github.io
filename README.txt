@@ -1,10 +1,9 @@
-শুধু Hat-trick এবং Highest Run ঠিক করা হয়েছে।
-
-- Admin New Match-এ Hat-trick ও Highest Run পাঠানো হবে।
-- Hat-trick যোগ হবে।
-- Highest Run মোট রান হিসেবে যোগ হবে না; নতুন ম্যাচের Highest Run আগেরটার চেয়ে বেশি হলে সেটি আপডেট হবে।
-- সেভের পর নতুন data আবার load হবে, তাই Home/Players-এ দেখাবে।
-- অন্য Ranking/Layout/Stats পরিবর্তন করা হয়নি।
-
-বর্তমান index.html-এর বদলে এই ZIP-এর index.html বসান।
-Code.gs-এ পরিবর্তন করা হয়নি।
+এই ভার্সনে:
+1. Admin PIN = 44990 রাখা হয়েছে।
+2. New Match-এ Highest Run এবং Hat-trick পাঠানো ও Save করা হয়।
+3. Save সফল হওয়ার পর Home/Players/Ranking-এর জন্য নতুন data আবার load হয়।
+4. Adjust Stats-এ Highest Run এবং Hat-trick-ও update হয়।
+5. Ranking-এ কোনো Score option/column নেই।
+6. Ranking: All-rounder = Run Average + Wicket Average; Batting = Run Average; Bowling = Wicket Average; Win = Win Average.
+7. Code.gs অবশ্যই Apps Script-এ deploy করে নতুন deployment/version দিতে হবে।
+8. GitHub Pages-এ index.html replace করতে হবে।
