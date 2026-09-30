@@ -90,10 +90,11 @@ function confirmSave(){
 
  api(pendingSave,x=>{
    saveBusy=false;
-   if(x.ok){
+   if(x.ok && x.saved && Array.isArray(x.players)){
+     DATA=x;
+     render();
      document.getElementById('previewMsg').textContent='সেভ হয়েছে ✅';
      document.getElementById('saveMsg').textContent='সেভ হয়েছে ✅';
-     if(x.players){DATA=x;render()}else{load()}
      ['match','won','lost','run','wicket','fifty','hundred','hattrick','highestRun'].forEach(id=>document.getElementById(id).value=id==='match'?1:0);
      pendingSave=null;
      setTimeout(()=>document.getElementById('savePreview').classList.add('hide'),700);
