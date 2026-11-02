@@ -71,7 +71,12 @@ function renderRanking(){
  const batAvg=p=>avg(p,'run');
  const bowlAvg=p=>avg(p,'wicket');
  const winAvg=p=>avg(p,'won');
- const all=[...ps].sort((a,b)=>(batAvg(b)+bowlAvg(b))-(batAvg(a)+bowlAvg(a))||batAvg(b)-batAvg(a)||bowlAvg(b)-bowlAvg(a));
+ const batOrder=[...ps].sort((a,b)=>batAvg(b)-batAvg(a)||(Number(b.run)||0)-(Number(a.run)||0));
+ const bowlOrder=[...ps].sort((a,b)=>bowlAvg(b)-bowlAvg(a)||(Number(b.wicket)||0)-(Number(a.wicket)||0));
+ const maxBatAvg=Math.max(0,...ps.map(p=>batAvg(p)));
+ const maxBowlAvg=Math.max(0,...ps.map(p=>bowlAvg(p)));
+ const allRoundPerformance=p=>(maxBatAvg>0?batAvg(p)/maxBatAvg:0)+(maxBowlAvg>0?bowlAvg(p)/maxBowlAvg:0);
+ const all=[...ps].sort((a,b)=>allRoundPerformance(b)-allRoundPerformance(a)||batAvg(b)-batAvg(a)||bowlAvg(b)-bowlAvg(a));
  const bat=[...ps].sort((a,b)=>batAvg(b)-batAvg(a)||(b.run||0)-(a.run||0));
  const bowl=[...ps].sort((a,b)=>bowlAvg(b)-bowlAvg(a)||(b.wicket||0)-(a.wicket||0));
  const wins=[...ps].sort((a,b)=>winAvg(b)-winAvg(a)||(b.won||0)-(a.won||0));
